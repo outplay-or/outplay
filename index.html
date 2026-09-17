@@ -1,0 +1,1948 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OUTPLAY LIVE LAB</title>
+<style>
+:root{
+  --bg:#06080a;
+  --felt-1:#0f7a52;--felt-2:#063d29;
+  --rail:#0c0d10;--rail-light:#262a30;
+  --brass:#f0a832;--brass-bright:#ffc94d;
+  --ivory:#f2f5f3;--ink:#0f0a04;
+  --red:#e8483a;--blue:#3d8fd9;--green:#3f8f5e;
+  --chip:#8b6bb8;--chip-dark:#5e4680;
+  --muted:#7c8a88;--panel:#0e1210;--panel-2:#080a09;
+  --line:rgba(242,245,243,.09);--brassline:rgba(240,168,50,.4);
+  --display-font:-apple-system,"Segoe UI",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+h2{font-family:var(--display-font);font-weight:900;letter-spacing:-.02em}
+body{margin:0;background:radial-gradient(ellipse at 50% -10%,#0d2a1e,var(--bg) 55%);color:var(--ivory);font-family:-apple-system,"Segoe UI",Arial,sans-serif;min-height:100vh}
+button,input,select{font:inherit;color:inherit}
+.hidden{display:none!important}
+.muted{color:var(--muted)}
+:focus-visible{outline:2px solid var(--brass-bright);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+.btn{border:0;border-radius:9px;padding:11px 16px;font-weight:800;cursor:pointer;background:#233530;color:var(--ivory);letter-spacing:.01em;box-shadow:0 3px 0 rgba(0,0,0,.25),0 4px 8px rgba(0,0,0,.3);transition:transform .06s,box-shadow .06s}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.25),0 2px 4px rgba(0,0,0,.25)}
+.btn.gold{background:linear-gradient(180deg,#ffd873,var(--brass) 65%,#c8871f);color:#241a08;box-shadow:0 3px 0 #8a5f10,0 5px 14px rgba(240,168,50,.35)}
+.btn.green{background:linear-gradient(180deg,#2a9068,#186b4a 70%,#0f4a33);color:#eafff3;box-shadow:0 3px 0 #0a3324,0 5px 10px rgba(0,0,0,.4)}
+.btn.red{background:linear-gradient(180deg,#c9564a,#9c3d32 70%,#742c24);color:#ffe9e5;box-shadow:0 3px 0 #52201a,0 5px 10px rgba(0,0,0,.4)}
+.btn.ghost{background:transparent;border:1px solid var(--line)}
+.btn:disabled{opacity:.32;cursor:not-allowed}
+.btn.wide{width:100%}
+
+.top{height:58px;display:flex;align-items:center;padding:0 18px;border-bottom:1px solid var(--line);background:rgba(10,12,11,.92);position:sticky;top:0;z-index:250;direction:ltr}
+.logo{font-size:15px;font-weight:900;letter-spacing:.02em;opacity:.9;font-family:var(--display-font)}
+.logo b{color:var(--brass);font-weight:800}
+.top .spacer{flex:1}
+.status{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.02em}
+
+/* ---------- Lobby ---------- */
+#lobby{padding:26px 20px 60px}
+.wrap{max-width:1180px;margin:auto}
+.hero{font-family:var(--display-font);font-size:46px;font-weight:900;margin:2px 0 8px;letter-spacing:-.03em;color:var(--ivory);text-shadow:0 2px 24px rgba(15,122,82,.5)}
+.sub{color:var(--muted);margin-bottom:26px;max-width:56ch;line-height:1.55;font-size:15px}
+.grid{display:grid;grid-template-columns:1.15fr .85fr;gap:16px}
+.box{background:linear-gradient(165deg,#131816,var(--panel) 40%);border:1px solid var(--line);border-radius:10px;padding:20px;box-shadow:0 1px 0 rgba(242,245,243,.03) inset}
+.box h2{margin:0 0 14px;font-size:16px;font-weight:800;color:var(--ivory)}
+.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.mode{padding:13px 14px;border-radius:6px;background:linear-gradient(155deg,rgba(15,122,82,.16),rgba(255,255,255,.02));border:1px solid var(--line);border-inline-start:3px solid transparent;cursor:pointer;text-align:right;display:flex;flex-direction:column;gap:2px;transition:border-color .15s,background .15s,box-shadow .15s}
+.mode:hover{background:linear-gradient(155deg,rgba(15,122,82,.26),rgba(255,255,255,.03))}
+.mode.active{border-inline-start-color:var(--brass-bright);background:linear-gradient(155deg,rgba(240,168,50,.2),rgba(240,168,50,.05));border-color:var(--brassline);box-shadow:0 0 0 1px rgba(240,168,50,.15),0 0 18px rgba(240,168,50,.18)}
+.mode-title{font-family:var(--display-font);font-weight:900;font-size:19px;color:var(--ivory);letter-spacing:-.01em}
+.mode.active .mode-title{color:var(--brass-bright)}
+.mode-sub{font-size:10.5px;color:var(--muted);direction:ltr;text-align:right;font-variant-numeric:tabular-nums}
+.form{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}
+.field label{font-size:11px;color:var(--muted);font-weight:700;display:block;margin-bottom:5px}
+.field select,.field input{width:100%;padding:10px;border-radius:9px;border:1px solid var(--line);background:var(--panel-2)}
+.players{display:flex;flex-direction:column;gap:7px}
+.pedit{display:flex;gap:9px;align-items:center;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.03)}
+.seatno{width:22px;height:22px;border-radius:50%;background:rgba(200,161,83,.16);color:var(--brass);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex:none}
+.pedit input{flex:1;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--panel-2)}
+.notice{font-size:12.5px;line-height:1.55;padding:12px;border-radius:12px;background:rgba(200,161,83,.07);border:1px solid var(--brassline);color:#e9d9ab;margin-top:12px}
+.kbd-hint{font-size:11px;color:var(--muted);margin-top:8px;direction:ltr;text-align:right}
+
+.tabs{display:flex;gap:6px;margin-bottom:16px;border-bottom:1px solid var(--line);padding-bottom:0}
+.tabbtn{background:none;border:0;padding:9px 4px;margin-inline-end:14px;font-weight:800;font-size:14px;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent}
+.tabbtn.active{color:var(--ivory);border-bottom-color:var(--brass)}
+.libnote{font-size:12px;line-height:1.55;color:var(--muted);margin-bottom:14px}
+.libfilters{display:flex;gap:6px;flex-wrap:wrap}
+.chip-filter{padding:6px 12px;border-radius:20px;border:1px solid var(--line);background:rgba(255,255,255,.03);font-size:12px;cursor:pointer;font-weight:700;color:var(--muted)}
+.chip-filter.active{border-color:var(--brassline);background:rgba(200,161,83,.12);color:var(--brass-bright)}
+.libgrid{display:flex;flex-direction:column;gap:8px;margin-top:14px;max-height:420px;overflow:auto}
+.spotcard{padding:12px 14px;border-radius:8px;background:linear-gradient(155deg,rgba(15,122,82,.1),rgba(255,255,255,.02));border:1px solid var(--line);border-inline-start:3px solid transparent;transition:border-color .15s,background .15s}
+.spotcard:hover{background:linear-gradient(155deg,rgba(15,122,82,.18),rgba(255,255,255,.03));border-inline-start-color:var(--brassline)}
+.spotcard-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.spotcard-title{font-weight:900;font-size:14px;letter-spacing:-.005em}
+.spotcard-tags{display:flex;gap:5px;margin-top:4px;flex-wrap:wrap}
+.tagpill{font-size:10px;padding:3px 8px;border-radius:20px;background:rgba(255,255,255,.06);color:var(--muted);font-weight:700}
+.tagpill.diff-beginner{background:rgba(63,143,94,.18);color:#7fd39c}
+.tagpill.diff-intermediate{background:rgba(200,161,83,.18);color:var(--brass-bright)}
+.tagpill.diff-advanced{background:rgba(168,67,58,.18);color:#e08c83}
+.spotcard-desc{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.5}
+.spotcard-actions{display:flex;gap:6px;margin-top:10px}
+.spotcard-actions .btn{padding:7px 12px;font-size:12px}
+.builder-form{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.builder-section{font-family:var(--display-font);font-weight:900;font-size:13px;color:var(--brass-bright);letter-spacing:.02em;margin:8px 0 -2px;padding-top:10px;border-top:1px solid var(--line)}
+.builder-form .full{grid-column:1/-1}
+.builder-form label{font-size:11px;color:var(--muted);font-weight:700;display:block;margin-bottom:5px}
+.builder-form input,.builder-form select,.builder-form textarea{width:100%;padding:9px;border-radius:9px;border:1px solid var(--line);background:var(--panel-2);color:var(--ivory)}
+.builder-form textarea{min-height:64px;resize:vertical}
+.stackgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stackgrid .field label{font-size:10px}
+.debrief-note{background:rgba(200,161,83,.08);border:1px solid var(--brassline);border-radius:12px;padding:14px;line-height:1.6;font-size:13.5px;margin:12px 0}
+.debrief-setup{font-size:12.5px;color:var(--muted);line-height:1.55;margin-bottom:10px}
+.toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%);background:rgba(168,67,58,.96);color:#fff;padding:10px 20px;border-radius:10px;font-weight:700;font-size:13px;z-index:300;box-shadow:0 8px 24px rgba(0,0,0,.45)}
+.remote-toggle{display:flex;gap:6px;margin-bottom:4px}
+.waitingroom-code{text-align:center;background:rgba(200,161,83,.08);border:1px solid var(--brassline);border-radius:14px;padding:18px}
+.waitingroom-code .label{font-size:11px;color:var(--muted);margin-bottom:6px}
+.waitingroom-code .code{font-size:34px;font-weight:900;letter-spacing:6px;color:var(--brass-bright);font-family:ui-monospace,Consolas,monospace;margin-bottom:10px}
+.waitseats{display:flex;flex-direction:column;gap:7px;margin-top:8px}
+.waitseat-row{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid var(--line)}
+.waitseat-row .dot{width:8px;height:8px;border-radius:50%;background:#3f8f5e;flex:none}
+.waitseat-row.empty .dot{background:#4a4a4a}
+.waitseat-row.empty{color:var(--muted)}
+.remote-badge{font-size:10px;padding:3px 9px;border-radius:20px;background:rgba(200,161,83,.15);color:var(--brass-bright);font-weight:700;margin-inline-start:8px}
+.storage-diag{font-size:12px;font-weight:700;padding:8px 12px;border-radius:9px;margin-bottom:12px;direction:rtl}
+.storage-diag.checking{background:rgba(255,255,255,.05);color:var(--muted)}
+.storage-diag.good{background:rgba(63,143,94,.15);color:#7fd39c}
+.storage-diag.bad{background:rgba(168,67,58,.15);color:#e08c83}
+
+/* ---------- Scoreboard / game ---------- */
+.game{padding:14px 10px}
+.hudmini{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:11.5px;direction:ltr;margin-inline-start:18px}
+.hudmini .row{display:flex;align-items:baseline;gap:6px}
+.hudmini .row span{color:var(--muted)}
+.hudmini .row b{color:var(--ivory);font-variant-numeric:tabular-nums;font-size:13px}
+.hudmini .row b.accent{color:var(--brass)}
+.layout{max-width:1600px;margin:0 auto;position:relative}
+.side-rail{position:absolute;left:10px;top:50%;transform:translateY(-50%);z-index:60;display:flex;flex-direction:column;gap:10px}
+.side-rail button{width:96px;height:42px;border-radius:11px;background:rgba(15,15,15,.85);border:1px solid var(--line);color:var(--ivory);display:flex;align-items:center;gap:8px;padding:0 10px;cursor:pointer;position:relative}
+.side-rail button:hover{border-color:var(--brassline)}
+.side-rail button.active-toggle{background:rgba(200,161,83,.18);border-color:var(--brassline)}
+.side-rail .rail-icon{font-size:17px;position:relative}
+.side-rail .rail-label{font-size:10px;font-weight:700;color:var(--ivory);white-space:nowrap}
+.side-rail .badge{position:absolute;top:-8px;right:-9px;background:var(--brass);color:#241a08;font-size:9px;font-weight:800;border-radius:20px;padding:1px 5px;min-width:14px;text-align:center;line-height:1.3}
+.panel{padding:14px;border-radius:13px;background:var(--panel);border:1px solid var(--line);margin-bottom:10px}
+.hero-panel{text-align:center}
+.hero-panel .label{font-size:11px;color:var(--muted)}
+.turnname{font-size:20px;font-weight:800;margin-top:2px}
+.ring{position:relative;width:66px;height:66px;margin:10px auto 0}
+.ring svg{transform:rotate(-90deg);width:100%;height:100%}
+.ring-bg{fill:none;stroke:rgba(255,255,255,.1);stroke-width:5}
+.ring-fg{fill:none;stroke:var(--brass);stroke-width:5;stroke-linecap:round;transition:stroke-dashoffset .3s linear}
+.ring-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:17px;font-variant-numeric:tabular-nums}
+.dl-title{font-size:11px;color:var(--muted);margin-bottom:8px}
+.log{font-size:11px;line-height:1.7;max-height:200px;overflow:auto;color:#c9d3ca}
+.quiet-list{margin:2px 0 4px}
+.ql-row{display:flex;justify-content:space-between;padding:9px 2px;border-bottom:1px solid var(--line);font-size:13px}
+.ql-row:last-child{border-bottom:none}
+.ql-row b{font-variant-numeric:tabular-nums}
+.quiet-note{font-size:11px;color:var(--muted);line-height:1.6;margin-top:12px}
+.dot-live{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--brass);margin-inline-end:5px}
+
+/* ---------- Table ---------- */
+.tablewrap{position:relative;min-height:80vh;display:flex;align-items:center;justify-content:center;padding-bottom:18px}
+.rail{position:relative;width:min(1540px,97%,155vh);aspect-ratio:2.05;border-radius:49%;padding:11px;background:radial-gradient(ellipse at 50% 30%,var(--rail-light),var(--rail) 78%);box-shadow:0 30px 90px rgba(0,0,0,.55),inset 0 1px 3px rgba(255,255,255,.08)}
+.table{position:relative;width:100%;height:100%;border-radius:49%;background:radial-gradient(ellipse at 50% 15%,var(--felt-1),var(--felt-2) 78%);box-shadow:inset 0 0 130px rgba(0,0,0,.6),inset 0 0 0 2px rgba(184,146,61,.35),inset 0 0 50px rgba(0,0,0,.25)}
+.table::before{content:'';position:absolute;inset:0;border-radius:49%;background:repeating-linear-gradient(115deg,rgba(255,255,255,.015) 0 2px,transparent 2px 5px);pointer-events:none}
+.seat{position:absolute;transform:translate(-50%,-50%);text-align:center;min-width:130px;direction:ltr}
+.cards{display:flex;justify-content:center;gap:4px;margin-bottom:4px}
+.avatar{width:54px;height:54px;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:19px;color:#fff;border:2px solid #2a2d33;box-shadow:0 2px 6px rgba(0,0,0,.4),inset 0 -6px 10px rgba(0,0,0,.25),inset 0 2px 3px rgba(255,255,255,.12);position:relative}
+@keyframes turnPulse{0%,100%{box-shadow:0 0 0 3px var(--brass),0 0 16px rgba(200,161,83,.55)}50%{box-shadow:0 0 0 4px var(--brass-bright),0 0 24px rgba(220,185,104,.85)}}
+.seat.turn .avatar{animation:turnPulse 1.6s ease-in-out infinite}
+@keyframes clockPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+.turnclock{position:absolute;top:-8px;right:-10px;min-width:22px;height:22px;border-radius:50%;background:#0c0d0f;border:2px solid var(--brass-bright);color:var(--brass-bright);font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center;z-index:8;font-variant-numeric:tabular-nums;box-shadow:0 2px 6px rgba(0,0,0,.5)}
+.turnclock.urgent{border-color:var(--red);color:#fff;background:var(--red);animation:clockPulse .6s ease-in-out infinite}
+.seatnum{position:absolute;top:-3px;left:-3px;width:17px;height:17px;border-radius:50%;background:var(--brass-bright);color:#1a1204;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px #0e0e0e}
+.nameplate{background:#0c0d0f;border:1px solid #24272c;border-radius:6px;padding:4px 9px;margin-top:-8px}
+.name{font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:4px;white-space:nowrap}
+.chips{font-size:18px;font-weight:800;font-variant-numeric:tabular-nums}
+.hudstat{font-size:9.5px;font-weight:700;font-variant-numeric:tabular-nums;color:#7fb8e0;letter-spacing:.02em;margin-top:1px}
+.hudstat.dim{color:#4a5258}
+.bbnote{font-size:9.5px;color:var(--muted);font-weight:600}
+.tag{display:inline-grid;place-items:center;min-width:16px;height:16px;border-radius:50%;padding:0 3px;background:var(--ivory);color:var(--ink);font-size:8.5px;font-weight:800}
+.tag.dealer{background:var(--ivory);box-shadow:0 0 0 2px var(--brass)}
+.tag.blind{background:var(--brass);color:#241a08}
+.tag.bounty{background:#8f2d2d;color:#ffe;min-width:auto;padding:0 5px;border-radius:8px;font-size:8px}
+.tag.bounty-won{background:var(--brass);color:#241a08;min-width:auto;padding:0 5px;border-radius:8px;font-size:8px;margin-inline-start:3px}
+.bet{min-height:26px;margin-top:6px}
+.betline{font-size:15px;font-weight:800;color:#fff;display:inline-flex;align-items:center;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:4px 10px 4px 6px;box-shadow:0 3px 8px rgba(0,0,0,.4)}
+
+.chip{position:relative;display:inline-block;width:20px;height:20px;vertical-align:middle;margin-inline-end:7px;flex:none}
+.chip::before,.chip::after{content:'';position:absolute;left:0;width:20px;height:10px;border-radius:50%;background:repeating-conic-gradient(var(--chip) 0deg 40deg,#fff 40deg 46deg) ;box-shadow:inset 0 0 0 2px rgba(255,255,255,.25),0 1px 1px rgba(0,0,0,.5),0 4px 0 -2px var(--chip-dark),0 4px 1px -1px rgba(0,0,0,.4)}
+.chip::before{top:0;z-index:2}
+.chip::after{top:5px;background:repeating-conic-gradient(var(--chip-dark) 0deg 40deg,#fff 40deg 46deg);z-index:1}
+
+.card{position:relative;width:58px;height:82px;border-radius:8px;background:var(--ink);box-shadow:0 4px 10px rgba(0,0,0,.5),inset 0 0 0 1px rgba(255,255,255,.08);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+.card .rank{font-weight:800;font-size:23px;color:#fff;line-height:1}
+.card .suiticon{font-size:24px;color:#fff;line-height:1}
+.card.suit-h{background:linear-gradient(180deg,#e5443c,#c22e28)}
+.card.suit-d{background:linear-gradient(180deg,#3f7fd9,#2a63b8)}
+.card.suit-c{background:linear-gradient(180deg,#3fa25e,#278246)}
+.card.suit-s{background:linear-gradient(180deg,#2b2b2e,#151517)}
+.card.back{background-color:#7a1f2b;background-image:repeating-linear-gradient(45deg,#8f2634 0 6px,#6c1620 6px 12px),repeating-linear-gradient(-45deg,#8f2634 0 6px,transparent 6px 12px);border:3px solid var(--ivory)}
+.board .card{width:66px;height:92px}.board .card .rank{font-size:28px}.board .card .suiticon{font-size:30px}
+@keyframes cardFlip{0%{transform:rotateY(85deg);opacity:0}60%{transform:rotateY(-6deg);opacity:1}100%{transform:rotateY(0)}}
+.card.flip-anim{animation:cardFlip .32s ease-out}
+
+.potwrap{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);text-align:center;background:rgba(0,0,0,.38);padding:7px 18px;border-radius:20px;border:1px solid rgba(236,229,214,.1);box-shadow:0 4px 14px rgba(0,0,0,.35)}
+.potlabel{font-size:9px;color:var(--muted);letter-spacing:.08em;margin-bottom:2px;font-weight:700}
+.potamt{font-size:23px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:4px;font-variant-numeric:tabular-nums}
+.handresult{position:absolute;left:50%;top:80%;transform:translateX(-50%);background:linear-gradient(180deg,rgba(240,168,50,.95),rgba(200,135,31,.95));color:#241a08;font-weight:900;font-size:15px;padding:7px 18px;border-radius:22px;white-space:nowrap;box-shadow:0 4px 18px rgba(240,168,50,.45);z-index:30;direction:ltr}
+.streetlabel{position:absolute;left:50%;top:68%;transform:translate(-50%,-50%);font-size:10.5px;font-weight:700;color:#a8c9bb;letter-spacing:.12em}
+.potbreak{font-size:10.5px;color:#cfe8db;margin-top:3px}
+.board{position:absolute;left:50%;top:37%;transform:translate(-50%,-50%);display:flex;gap:6px;direction:ltr}
+
+
+.actionbar{position:sticky;bottom:0;z-index:25;margin-top:10px;background:linear-gradient(180deg,rgba(14,26,21,.94),rgba(8,14,11,.98));border-top:1px solid var(--line);padding:10px;direction:ltr}
+.actions{display:flex;justify-content:center;gap:8px;align-items:center;flex-wrap:wrap}
+.actions .btn{min-width:96px}
+.raisebox{display:flex;gap:10px;align-items:center;background:#0f2019;border:1px solid var(--line);border-radius:13px;padding:10px 14px}
+.raisebox input[type=number]{width:104px;padding:9px;border-radius:9px;border:1px solid var(--line);background:var(--panel-2);text-align:center;font-weight:800;font-size:15px}
+.raisebox input[type=range]{width:220px;height:28px;accent-color:var(--brass);cursor:pointer}
+.raisebox input[type=range]::-webkit-slider-thumb{width:26px;height:26px;cursor:pointer}
+.raisebox input[type=range]::-moz-range-thumb{width:26px;height:26px;cursor:pointer;border:none}
+.wheel-hint{font-size:9.5px;color:var(--muted);text-align:center;margin-top:2px}
+.quick{display:flex;gap:5px;justify-content:center;margin-bottom:7px}
+.quick .btn{padding:6px 11px;font-size:11px}
+.quick .btn.active{background:var(--brass);color:#241a08;border-color:var(--brass);font-weight:800}
+@keyframes flashUpdate{0%{box-shadow:0 0 0 3px var(--brass-bright);background:rgba(200,161,83,.25)}100%{box-shadow:0 0 0 0 transparent;background:var(--panel-2)}}
+#raiseTo.flash-update{animation:flashUpdate .5s ease-out}
+
+/* ---------- Privacy + modals ---------- */
+.privacy{display:none;position:fixed;inset:0;background:radial-gradient(ellipse at 50% 30%,#123527,#050b08 75%);z-index:100;align-items:center;justify-content:center;padding:20px}
+.privacy.open{display:flex}
+.privacybox{width:min(480px,94vw);text-align:center;background:rgba(9,17,14,.92);border:1px solid var(--brassline);border-radius:18px;padding:26px}
+.privlabel{font-size:11px;color:var(--muted);letter-spacing:.02em}
+.privacybox h2{font-size:26px;margin:4px 0 12px}
+.privacybox p{color:#cfd8d1;font-size:13.5px;line-height:1.6;margin-bottom:16px}
+
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:200;align-items:center;justify-content:center;padding:20px}
+.modal.open{display:flex}
+.modalbox{width:min(680px,94vw);max-height:86vh;overflow:auto;background:#0e1b16;border:1px solid var(--brassline);border-radius:16px;padding:22px}
+.modalbox h2{margin-top:0}
+.histrow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 4px;border-bottom:1px solid var(--line)}
+.histrow:last-child{border-bottom:none}
+.revrow{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--line)}
+.revrow:last-child{border-bottom:none}
+.revname{flex:none;font-size:13px}
+.reviewfelt{background:radial-gradient(ellipse,var(--felt-1),var(--felt-2) 78%);border-radius:16px;padding:16px;margin:10px 0;display:flex;justify-content:center}
+
+.replay-tablewrap{padding:6px 0}
+.replay-rail{position:relative;width:100%;max-width:520px;margin:0 auto;aspect-ratio:1.5;border-radius:49%;padding:14px;background:radial-gradient(ellipse at 50% 25%,var(--rail-light),var(--rail) 72%)}
+.replay-table{position:relative;width:100%;height:100%;border-radius:49%;background:radial-gradient(ellipse at 50% 18%,var(--felt-1),var(--felt-2) 74%);box-shadow:inset 0 0 60px rgba(0,0,0,.5)}
+.replay-table>.board{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;gap:3px;direction:ltr}
+.replay-pot{position:absolute;left:50%;top:66%;transform:translateX(-50%);display:flex;align-items:center;gap:4px;font-size:12px;font-weight:800;color:var(--ivory);background:rgba(0,0,0,.4);padding:3px 8px;border-radius:10px;direction:ltr}
+.replay-pot .chip{width:14px;height:14px}
+.replay-table .board .card{width:26px;height:36px}
+.replay-table .board .rank{font-size:12px}.replay-table .board .suiticon{font-size:12px}
+.replay-seat{position:absolute;transform:translate(-50%,-50%);text-align:center;min-width:74px;direction:ltr}
+.replay-seat .cards{display:flex;justify-content:center;gap:2px;margin-bottom:2px}
+.replay-seat .card{width:26px;height:36px}
+.replay-seat .card .rank{font-size:11px}.replay-seat .card .suiticon{font-size:11px}
+.replay-seat .avatar{width:26px;height:26px;font-size:11px;margin:0 auto;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;border:2px solid #1e1e1e}
+.replay-seat .nameplate{background:rgba(10,10,10,.9);border-radius:6px;padding:2px 5px;margin-top:-4px}
+.replay-seat .name{font-weight:700;white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:2px;font-size:9.5px}
+.replay-seat .tag{min-width:11px;height:11px;font-size:6.5px}
+.replay-seat.winner .avatar{box-shadow:0 0 0 2px var(--brass),0 0 10px rgba(200,161,83,.6)}
+.win-amt{color:#7fd39c;font-weight:800;font-size:9px}
+.replay-seat .bet{min-height:0;margin-top:3px}
+.replay-seat .betline{font-size:9px;padding:2px 6px 2px 4px;border-radius:10px}
+.replay-seat .betline .chip{width:11px;height:11px}
+.replay-seat .betline.allin-bet{background:rgba(184,69,58,.85);border-color:rgba(255,201,77,.5);color:#fff}
+.fold-stamp{position:absolute;top:6px;left:50%;transform:translateX(-50%) rotate(-8deg);background:rgba(15,9,4,.85);color:#b8453a;font-weight:900;font-size:9px;letter-spacing:.08em;padding:1px 6px;border-radius:4px;border:1px solid rgba(184,69,58,.5)}
+
+.street-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:8px;direction:ltr}
+.street-col{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:10px;padding:10px}
+.street-head{font-weight:800;font-size:12px;margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:4px}
+.street-head-top{display:flex;justify-content:space-between;align-items:baseline;gap:6px}
+.street-pot{font-size:10px;font-weight:700;color:var(--brass-bright)}
+.street-board{display:flex;gap:2px;direction:ltr}
+.street-board .card{width:22px;height:30px}
+.street-board .card .rank{font-size:10px}.street-board .card .suiticon{font-size:10px}
+.street-line{font-size:11px;color:#c9d3ca;line-height:1.7;border-radius:4px;padding:1px 4px;margin:0 -4px;transition:background .2s,color .2s}
+.street-line.now-playing{background:rgba(240,168,50,.22);color:var(--brass-bright);font-weight:800}
+.replay-progress{height:4px;border-radius:2px;background:rgba(255,255,255,.08);margin:2px auto 0;max-width:280px;overflow:hidden}
+.replay-progress-fill{height:100%;background:linear-gradient(90deg,var(--brass),var(--brass-bright));transition:width .25s ease}
+.street-line.muted{color:var(--muted)}
+
+@media(max-width:700px){
+  .grid{grid-template-columns:1fr}
+  .modes{grid-template-columns:1fr 1fr}
+  .top{height:auto;min-height:44px;padding:6px 12px;flex-wrap:wrap;row-gap:2px}
+  .hudmini{margin-inline-start:0;font-size:9.5px;gap:2px 8px}
+  .tablewrap{min-height:auto;padding:8px 0 55px;align-items:flex-start}
+  .rail{aspect-ratio:1.5}
+  .side-rail{position:static;flex-direction:row;justify-content:center;gap:6px;margin:0 auto 55px;width:fit-content;transform:none;left:auto;top:auto}
+  .side-rail button{width:auto;height:30px;padding:0 8px;gap:4px}
+  .side-rail .rail-icon{font-size:13px}
+  .side-rail .rail-label{font-size:8px}
+  .side-rail .badge{top:-6px;right:-6px}
+  .seat{min-width:76px}
+  .avatar{width:34px;height:34px;font-size:12px}
+  .card{width:34px;height:48px}
+  .card .rank{font-size:13px}
+  .card .suiticon{font-size:13px}
+  .board .card{width:38px;height:54px}
+  .board .card .rank{font-size:15px}
+  .board .card .suiticon{font-size:16px}
+  .nameplate{padding:1px 5px;margin-top:-6px;max-width:104px;margin-inline:auto}
+  .name{font-size:9px;gap:2px;flex-wrap:wrap;justify-content:center;row-gap:1px}
+  .tag.bounty,.tag.bounty-won{font-size:7px;padding:0 3px}
+  .seat{z-index:1}
+  .seat.turn{z-index:5}
+  .hudstat{margin-top:0}
+  .chips{font-size:12px}
+  .hudstat{font-size:7px}
+  body.compact8 .seat{min-width:62px}
+  body.compact8 .avatar{width:26px;height:26px;font-size:10px}
+  body.compact8 .card{width:26px;height:37px}
+  body.compact8 .card .rank{font-size:10px}
+  body.compact8 .card .suiticon{font-size:10px}
+  body.compact8 .nameplate{padding:1px 4px;margin-top:-4px}
+  body.compact8 .name{font-size:7.5px}
+  body.compact8 .chips{font-size:10px}
+  body.compact8 .hudstat{font-size:6px}
+  body.compact8 .tag{min-width:12px;height:12px;font-size:6.5px}
+  .hudmini{font-size:9.5px;gap:2px 8px;margin-inline-start:8px}
+  .logo{font-size:11px}
+  .betline{font-size:12px;padding:3px 8px 3px 5px}
+  .chip{width:16px;height:16px}
+  .chip::before,.chip::after{width:16px;height:8px}
+  .chip::after{top:4px}
+  .raisebox input[type=range]{width:110px}
+  .raisebox input[type=number]{width:74px}
+}
+@media(max-width:480px){
+  .actions .btn{min-width:0;padding:11px 10px;font-size:13px}
+  .board{gap:3px}
+  .card{width:36px;height:51px}
+  .card .rank{font-size:13px}
+  .card .suiticon{font-size:13px}
+  .board .card{width:40px;height:57px}
+  .board .card .rank{font-size:15px}
+  .board .card .suiticon{font-size:16px}
+}
+/* Landscape phone: wide but very short. The width-based mobile rules above never
+   fire here (a rotated phone is ~844px wide), yet vertical space is the real
+   constraint, so key off height instead. */
+@media(max-height:500px) and (orientation:landscape){
+  .top{height:auto;min-height:34px;padding:3px 10px;flex-wrap:wrap;row-gap:0}
+  .logo{font-size:11px}
+  .hudmini{font-size:9px;gap:0 8px;margin-inline-start:6px}
+  .tablewrap{min-height:calc(100vh - 125px);padding:2px 0 4px;align-items:center}
+  .side-rail{position:absolute;left:6px;top:50%;transform:translateY(-50%);flex-direction:column;gap:4px;margin:0;width:auto}
+  .side-rail button{width:auto;height:22px;padding:0 6px;gap:3px}
+  .side-rail .rail-icon{font-size:10px}
+  .side-rail .rail-label{font-size:7px}
+  .side-rail .badge{top:-5px;right:-5px;font-size:8px}
+  .seat{min-width:66px}
+  .avatar{width:28px;height:28px;font-size:11px;border-width:2px}
+  .seatnum{width:13px;height:13px;font-size:7px;top:-2px;left:-2px}
+  .card{width:22px;height:31px}
+  .card .rank{font-size:9px}
+  .card .suiticon{font-size:9px}
+  .board .card{width:28px;height:40px}
+  .board .card .rank{font-size:12px}
+  .board .card .suiticon{font-size:12px}
+  .nameplate{padding:1px 5px;margin-top:-4px}
+  .name{font-size:8px;gap:2px}
+  .chips{font-size:11px}
+  .hudstat{display:none}
+  .bet{min-height:0;margin-top:2px}
+  .tag{min-width:12px;height:12px;font-size:6.5px}
+  .potwrap{padding:3px 10px}
+  .potlabel{font-size:7px;margin-bottom:0}
+  .potamt{font-size:14px}
+  .streetlabel{font-size:8px}
+  .betline{font-size:10px;padding:2px 7px 2px 4px}
+  .chip{width:13px;height:13px;margin-inline-end:4px}
+  .chip::before,.chip::after{width:13px;height:7px}
+  .chip::after{top:3px}
+  .actionbar{padding:4px 8px}
+  .quick{margin-bottom:3px}
+  .quick .btn{padding:4px 9px;font-size:11px}
+  .actions{gap:6px}
+  .actions .btn{min-width:0;padding:7px 12px;font-size:12px}
+  .raisebox input[type=range]{width:110px}
+  .raisebox input[type=number]{width:66px;padding:5px}
+  .wheel-hint{display:none}
+}
+/* Very short landscape (e.g. 360px-tall Android): shrink the seat furniture
+   further, since seat height is the binding constraint at this size. */
+@media(max-height:380px) and (orientation:landscape){
+  .seat{min-width:58px}
+  .avatar{width:24px;height:24px;font-size:10px}
+  .seatnum{width:11px;height:11px;font-size:6px}
+  .card{width:19px;height:27px}
+  .card .rank{font-size:8px}
+  .card .suiticon{font-size:8px}
+  .board .card{width:25px;height:36px}
+  .board .card .rank{font-size:11px}
+  .board .card .suiticon{font-size:11px}
+  .name{font-size:7px}
+  .chips{font-size:9.5px}
+  .nameplate{padding:0 4px;margin-top:-3px}
+  .betline{font-size:9px;padding:1px 6px 1px 3px}
+  .actionbar{padding:3px 6px}
+  .actions .btn{padding:6px 10px;font-size:11px}
+  .quick .btn{padding:3px 7px;font-size:10px}
+}
+</style></head>
+<body>
+
+<div class="top"><div class="logo">OUT<b>PLAY</b></div><div id="hudmini" class="hudmini hidden"></div><div class="spacer"></div><button type="button" id="exitBtn" class="btn ghost hidden" style="padding:7px 14px;font-size:12px" onclick="confirmBackToLobby()">⟵ יציאה לתפריט</button><div class="status" id="topStatus">שולחן אימון</div></div>
+
+<section id="lobby"><div class="wrap">
+  <div class="hero">שולחן אימון</div>
+  <div class="sub">מנוע יד עצמאי, אקשן מיידי, 2/4/6 שחקנים על אותו מכשיר — בלי בוטים ובלי תלות ברשת.</div>
+  <div class="grid">
+    <div class="box">
+      <div class="tabs">
+        <button type="button" class="tabbtn active" id="tabbtnFree" onclick="switchTab('free')">משחק חופשי</button>
+        <button type="button" class="tabbtn" id="tabbtnRemote" onclick="switchTab('remote')">משחק מרחוק</button>
+        <button type="button" class="tabbtn" id="tabbtnLib" onclick="switchTab('library')">ספריית תרגילים</button>
+      </div>
+      <div id="tabFree">
+        <div id="modes" class="modes"></div>
+        <div class="form">
+          <div class="field"><label>שחקנים</label><select id="num" onchange="renderPlayers()"><option>8</option><option selected>6</option><option>4</option><option>2</option></select></div>
+          <div class="field"><label>עליית רמות (בליינדים)</label><select id="levelMin"><option value="0">כבוי — בליינד קבוע</option><option value="5">כל 5 דקות (טורבו)</option><option value="8">כל 8 דקות (מהיר)</option><option value="10" selected>כל 10 דקות (רגיל)</option><option value="15">כל 15 דקות (עמוק)</option></select></div>
+          <div class="field"><label>שעון החלטה</label><select id="clock"><option value="0" selected>כבוי — פיילוט</option><option value="30">30 שניות</option><option value="18">18 שניות</option></select></div>
+          <div class="field"><label>אנטה על ה-BB</label><select id="ante"><option value="1" selected>פועל</option><option value="0">כבוי</option></select></div>
+          <div class="field"><label>יד הבאה אוטומטית</label><select id="auto"><option value="1" selected>פועל</option><option value="0">כבוי</option></select></div>
+          <div class="field"><label>זמן צפייה בתוצאת היד</label><select id="reviewMs"><option value="2000">2 שניות</option><option value="4000" selected>4 שניות</option><option value="6000">6 שניות</option><option value="9000">9 שניות</option></select></div>
+          <div class="field"><label>צלילי התראה</label><select id="sound"><option value="0" selected>כבוי</option><option value="1">פועל</option></select></div>
+          <div class="field"><label>פורמט טורניר</label><select id="tourneyFormat" onchange="renderPlayers()"><option value="0" selected>רגיל</option><option value="1">באונטי</option></select></div>
+          <div class="field" id="bountyAmountField" style="display:none"><label>באונטי בסיס ($)</label><input type="number" id="bountyAmountUSD" value="20" min="1" step="1" oninput="this.dataset.userEdited='1';syncBountySeats()"></div>
+        </div>
+        <div id="bountySeatsWrap" style="display:none;margin-top:10px">
+          <div class="dl-title">באונטי לכל שחקן — ערכו לפי הסיטואציה שאתם רוצים לתרגל</div>
+          <div class="libnote">בטורניר אמיתי לכל שחקן באונטי שונה, לפי כמה הדיח. שנו כאן כדי לשחזר מצב אמיתי (למשל שחקן שכבר צבר $80).</div>
+          <div id="bountySeats" class="stackgrid" style="margin-top:8px"></div>
+        </div>
+        <div class="grid2" style="margin-top:10px">
+          <div class="field"><label>תרגול עצמי מול בוטים</label><select id="soloBots" onchange="renderPlayers()"><option value="0" selected>כבוי</option><option value="1">פועל</option></select></div>
+          <div class="field" id="soloSeatField" style="display:none"><label>איזה מושב אתם</label><select id="soloSeat"></select></div>
+        </div>
+        <div class="libnote" id="botNote" style="display:none">הבוטים משחקים לפי היגיון בסיסי ומעורבב — לא פתרון GTO. שימושי לחימום ותרגול קצב, לא כמקור לתשובה "נכונה".</div>
+        <button class="btn gold wide" style="margin-top:14px;font-size:16px" onclick="startSession()">START TRAINING SESSION</button>
+      </div>
+      <div id="tabRemote" class="hidden">
+        <div class="libnote">משחק מרחוק דרך קישור אחד ששולחים לחברים. מי שיוצר את החדר צריך להשאיר את הכרטיסייה פתוחה למשך כל הסשן (המכשיר הזה מנהל את המשחק בפועל). הערה חשובה: אין כאן חשבונות משתמש או הצפנה — מי שיודע את קוד החדר יכול תיאורטית לגשת אליו. לתרגול חברי זה בסדר גמור; לכסף אמיתי הייתי מוסיף שכבת אבטחה אמיתית קודם.</div>
+        <div id="storageDiag" class="storage-diag checking">בודק חיבור אחסון…</div>
+        <div class="remote-toggle">
+          <button type="button" class="chip-filter active" id="remoteToggleCreate" onclick="showRemotePane('create')">יצירת חדר</button>
+          <button type="button" class="chip-filter" id="remoteToggleJoin" onclick="showRemotePane('join')">הצטרפות לחדר</button>
+        </div>
+
+        <div id="remoteCreatePane">
+          <div class="form" style="margin-top:12px">
+            <div class="field full" style="grid-column:1/-1"><label>השם שלך (המארח)</label><input id="rHostName" value="COACH"></div>
+            <div class="field"><label>שחקנים</label><select id="rNum"><option>8</option><option selected>6</option><option>4</option><option>2</option></select></div>
+            <div class="field"><label>עומק פתיחה</label><select id="rMode"></select></div>
+            <div class="field"><label>עליית רמות</label><select id="rLevelMin"><option value="0">כבוי</option><option value="5">כל 5 דקות (טורבו)</option><option value="8">כל 8 דקות (מהיר)</option><option value="10" selected>כל 10 דקות (רגיל)</option><option value="15">כל 15 דקות (עמוק)</option></select></div>
+            <div class="field"><label>אנטה על ה-BB</label><select id="rAnte"><option value="1" selected>פועל</option><option value="0">כבוי</option></select></div>
+          </div>
+          <button class="btn gold wide" style="margin-top:14px" onclick="createRoom()">צור חדר</button>
+        </div>
+
+        <div id="remoteJoinPane" class="hidden" style="margin-top:12px">
+          <div class="form">
+            <div class="field"><label>קוד חדר</label><input id="jCode" style="text-transform:uppercase;letter-spacing:2px;font-weight:800" maxlength="6" placeholder="ABCDE"></div>
+            <div class="field"><label>השם שלך</label><input id="jName" placeholder="השם שיוצג לאחרים"></div>
+          </div>
+          <button class="btn gold wide" style="margin-top:14px" onclick="joinRoom()">הצטרפות</button>
+          <div id="joinError" class="muted" style="font-size:12px;margin-top:8px"></div>
+        </div>
+
+        <div id="remoteWaitingRoom" class="hidden">
+          <div class="waitingroom-code">
+            <div class="label">קוד החדר — שלחו לחברים</div>
+            <div class="code" id="waitCode"></div>
+            <button class="btn ghost" onclick="copyRoomCode()">העתקת קוד</button>
+          </div>
+          <div class="dl-title" style="margin-top:16px">מי הצטרף</div>
+          <div id="waitSeats" class="waitseats"></div>
+          <button class="btn gold wide" id="waitStartBtn" style="margin-top:14px" onclick="hostStartRoom()">התחל משחק</button>
+          <div id="waitGuestNote" class="muted hidden" style="font-size:12.5px;margin-top:10px;text-align:center">ממתינים שהמארח יתחיל את המשחק…</div>
+          <button class="btn ghost wide" style="margin-top:8px" onclick="leaveRoom()">יציאה מהחדר</button>
+        </div>
+      </div>
+
+      <div id="tabLibrary" class="hidden">
+        <div class="libnote">ספריית תרגילים בונה מצב שולחן מדויק — סטאקים, בליינדים, פעולה שכבר קרתה — וטוענת אותו ישירות למנוע. כל תרגיל כולל הערת מאמן; ערכו אותה כרצונכם, זו הדעה שלכם, לא פסיקת GTO.</div>
+        <div class="libfilters" id="libCatFilters"></div>
+        <div class="libfilters" id="libDiffFilters" style="margin-top:6px"></div>
+        <div id="libraryList" class="libgrid"></div>
+        <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+          <button class="btn gold" onclick="openSpotBuilder()">+ צור תרגיל חדש</button>
+          <button class="btn ghost" onclick="exportLibrary()">ייצוא ספרייה</button>
+          <label class="btn ghost" style="cursor:pointer">ייבוא ספרייה<input type="file" id="importFileInput" accept="application/json" style="display:none" onchange="importLibrary(event)"></label>
+        </div>
+        <div class="dl-title" style="margin-top:20px">ידיים וטורנירים</div>
+        <div class="libnote">ייבוא טורניר: העלו קובץ hand history טקסט (.txt) מ-GGPoker / PokerStars — כל הידיים ייטענו לסקירה ותוכלו לעבור עליהן אחת-אחת עם הריפליי הוויזואלי. ייצוא/ייבוא סשן הוא בפורמט הפנימי של OUTPLAY.</div>
+        <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+          <label class="btn gold" style="cursor:pointer">📥 ייבוא טורניר (hand history)<input type="file" id="importHHFile" accept=".txt,text/plain" style="display:none" onchange="importHandHistory(event)"></label>
+          <button class="btn ghost" onclick="openHistory()">סקירת ידיים <span id="libHistCount"></span></button>
+          <button class="btn ghost" onclick="exportSessionHistory()">ייצוא סשן</button>
+          <label class="btn ghost" style="cursor:pointer">ייבוא סשן<input type="file" id="importHistFile" accept="application/json" style="display:none" onchange="importSessionHistory(event)"></label>
+        </div>
+      </div>
+    </div>
+    <div class="box">
+      <h2>שחקנים</h2>
+      <div id="players" class="players"></div>
+
+    </div>
+  </div>
+</div></section>
+
+<section id="game" class="game hidden">
+  <div class="layout">
+    <div class="side-rail" id="sideRail"></div>
+    <main><div class="tablewrap"><div class="rail"><div class="table" id="table"></div></div></div></main>
+  </div>
+  <div class="actionbar" id="actionbar"></div>
+</section>
+
+<div class="privacy" id="privacy">
+  <div class="privacybox">
+    <div class="privlabel">תור פרטי</div>
+    <h2 id="privName" aria-live="polite"></h2>
+    <p>העבירו את המכשיר לשחקן הבא. הקלפים עדיין מוסתרים עד שילחצו על הצג קלפים.</p>
+    <button class="btn gold wide" onclick="reveal()">הצג את הקלפים שלי</button>
+  </div>
+</div>
+
+<div class="modal" id="historyModal"><div class="modalbox" id="historyBox"></div></div>
+<div class="modal" id="endModal"><div class="modalbox" style="text-align:center">
+  <div class="privlabel">סוף סשן</div>
+  <h2 id="endTitle" style="margin:6px 0 16px"></h2>
+  <button class="btn gold wide" onclick="location.reload()">התחלת סשן חדש</button>
+</div></div>
+
+<script>
+"use strict";
+const $=x=>document.getElementById(x), SU={s:'♠',h:'♥',d:'♦',c:'♣'}, POS={8:[[50,11],[75,23],[87,50],[75,77],[50,89],[25,77],[13,50],[25,23]],6:[[50,11],[87,28],[87,72],[50,89],[13,72],[13,28]],4:[[50,12],[87,50],[50,88],[13,50]],2:[[50,13],[50,87]]};
+const POS_MOBILE={8:[[50,5],[80,14],[93,50],[80,86],[50,95],[20,86],[7,50],[20,14]],6:[[50,7],[86,16],[86,84],[50,93],[14,84],[14,16]]};
+// Landscape uses a wide, flat oval - seats spread along the long top and bottom
+// edges rather than stacking vertically, where there simply isn't room.
+const POS_LANDSCAPE={
+ 8:[[30,9],[50,5],[70,9],[94,50],[70,91],[50,95],[30,91],[6,50]],
+ 6:[[33,8],[67,8],[94,50],[67,92],[33,92],[6,50]],
+ 4:[[33,8],[90,50],[33,92],[10,50]],
+ 2:[[22,50],[78,50]]
+};
+function isLandscapePhone(){return window.innerHeight<=500&&window.innerWidth>window.innerHeight}
+function isCompactLayout(){return window.innerWidth<=700||isLandscapePhone()}
+function posFor(n){
+ if(isLandscapePhone()&&POS_LANDSCAPE[n])return POS_LANDSCAPE[n];
+ return(isCompactLayout()&&POS_MOBILE[n])?POS_MOBILE[n]:POS[n];
+}
+function applyMobileAspect(n){
+ let el=document.querySelector('.rail');if(!el)return;
+ let landscape=isLandscapePhone();
+ document.body.classList.toggle('compact8',isCompactLayout()&&n===8);
+ if(!isCompactLayout()){el.style.aspectRatio='';el.style.width='';return}
+ if(landscape){
+   // Landscape: plenty of width, very little height. A seat box is ~130px tall and
+   // is centred on the felt edge, so it overhangs by ~half its height at top and
+   // bottom. Budget for that explicitly instead of guessing, or seats collide with
+   // the rail above and the action bar below.
+   // Landscape has width to spare and very little height. Rather than forcing a
+   // fixed aspect ratio (which made the oval narrow and bunched the seats
+   // together), take the width that's actually available and derive the ratio
+   // from the height budget - giving a wide, flat table like real clients use.
+   let seatOverhang=n===8?58:56;
+   let chromeAbove=37;
+   let chromeBelow=88;
+   let availH=Math.max(70,window.innerHeight-chromeAbove-chromeBelow-(seatOverhang*2));
+   let availW=window.innerWidth-120;              // leave room for the vertical rail
+   let ar=Math.max(1.6,Math.min(5.5,availW/availH));
+   el.style.aspectRatio=ar;
+   el.style.width=Math.min(availW,availH*ar)+'px';
+   return;
+ }
+ let ar={8:0.68,6:1.3,4:1.5,2:1.5}[n]||1.5;
+ el.style.aspectRatio=ar;
+ let availH=window.innerHeight*0.44;
+ let widthFromHeight=availH*ar;
+ let widthFromViewport=window.innerWidth*0.97;
+ el.style.width=Math.min(widthFromHeight,widthFromViewport)+'px';
+}
+window.addEventListener('resize',()=>{if(typeof G!=='undefined'&&G)render()});
+window.addEventListener('orientationchange',()=>{setTimeout(()=>{if(typeof G!=='undefined'&&G)render()},150)});
+const MODES={d10:['10BB',2500,5000,10],d15:['15BB',2000,4000,15],d20:['20BB',1250,2500,20],d30:['30BB',1000,2000,30],d50:['50BB',500,1000,50],d100:['100BB',250,500,100],d200:['200BB',125,250,200],b25:['Bubble Avg 25BB',10000,20000,25],b40:['Bubble Avg 40BB',5000,10000,40],ft40:['Final Table Avg 40BB',10000,20000,40]};
+let sel='d20', G=null, timer=null, levelTimer=null, revealSeat=null, history=[];
+let soundOn=false, wasShown={}, actx=null;
+function fmt(n){return Math.round(n||0).toLocaleString()}function ri(n){if(n<=1)return 0;let a=new Uint32Array(1),lim=Math.floor(2**32/n)*n;do{crypto.getRandomValues(a)}while(a[0]>=lim);return a[0]%n}function sh(a){for(let i=a.length-1;i>0;i--){let j=ri(i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
+function fmtChip(n){if(typeof liveShowBB!=='undefined'&&liveShowBB&&G&&G.bb)return(n/G.bb).toFixed(1)+' BB';return fmt(n)}
+function deck(){let a=[];for(let s of 'shdc')for(let r of '23456789TJQKA')a.push(r+s);return sh(a)}
+function renderModes(){$('modes').innerHTML=Object.entries(MODES).map(([k,v])=>`<button type="button" class="mode ${k===sel?'active':''}" onclick="sel='${k}';renderModes()"><span class="mode-title">${v[0]}</span><span class="mode-sub">${fmt(v[1])} / ${fmt(v[2])}</span></button>`).join('');
+ let bf=$('bountyAmountUSD');
+ if(bf&&!bf.dataset.userEdited){
+  let targetBB=MODES[sel][3],suggested;
+  if(targetBB>=100)suggested=10;else if(targetBB>=30)suggested=15;else if(targetBB>=15)suggested=20;else suggested=25;
+  bf.value=suggested;
+ }
+}
+function renderPlayers(){let n=+$('num').value,names=['COACH','Daniel','Noam','Amit','Yoni','Tal','Roi','Maya'];$('players').innerHTML=Array.from({length:n},(_,i)=>`<div class="pedit"><span class="seatno">${i+1}</span><input id="nm${i}" value="${names[i]||'Player '+(i+1)}"></div>`).join('');
+ let botsOn=$('soloBots')&&$('soloBots').value==='1';
+ if($('soloSeatField'))$('soloSeatField').style.display=botsOn?'':'none';
+ if($('botNote'))$('botNote').style.display=botsOn?'':'none';
+ if($('soloSeat'))$('soloSeat').innerHTML=Array.from({length:n},(_,i)=>`<option value="${i}">Seat ${i+1}</option>`).join('');
+ let bountyOn=$('tourneyFormat')&&$('tourneyFormat').value==='1';
+ if($('bountyAmountField'))$('bountyAmountField').style.display=bountyOn?'':'none';
+ if($('bountySeatsWrap'))$('bountySeatsWrap').style.display=bountyOn?'':'none';
+ if(bountyOn)syncBountySeats();
+}
+// Per-seat bounty inputs. Rebuilds for the current player count, keeping any value
+// the coach already typed for a seat so changing other settings doesn't wipe their work.
+function syncBountySeats(){
+ let wrap=$('bountySeats');if(!wrap)return;
+ let n=+$('num').value;
+ let base=Math.max(1,+($('bountyAmountUSD')?.value||20));
+ let prev={};
+ wrap.querySelectorAll('input[data-seat]').forEach(inp=>{prev[inp.dataset.seat]=inp.value});
+ wrap.innerHTML=Array.from({length:n},(_,i)=>{
+   let nameEl=$('nm'+i);
+   let nm=nameEl&&nameEl.value.trim()?nameEl.value.trim():`Seat ${i+1}`;
+   let val=(prev[i]!==undefined&&prev[i]!=='')?prev[i]:base;
+   return`<div class="field"><label>${nm}</label><input type="number" data-seat="${i}" id="bountySeat${i}" min="0" step="1" value="${val}"></div>`;
+ }).join('');
+}
+renderModes();renderPlayers();
+
+/* ================= SCENARIO LIBRARY ================= */
+const CATS={pushfold:'Push/Fold',threebet:'3-bet / 4-bet פוטים',icm:'Bubble / ICM',bbdefense:'הגנת BB ועמדות',other:'אחר'};
+const DIFFS={beginner:'מתחילים',intermediate:'בינוני',advanced:'מתקדם'};
+let libCatFilter='all', libDiffFilter='all', customSpots=[], editingSpotId=null;
+
+const SPOT_LIBRARY=[
+{id:'pf-co-10bb',title:'פתיחת שאב מ-CO ב-10BB',category:'pushfold',difficulty:'beginner',n:6,sb:500,bb:1000,bba:0,button:0,
+ stacks:[25000,30000,22000,18000,20000,10000],street:'PREFLOP',preFolded:[3,4],heroSeat:5,
+ setupText:'אתם ב-CO עם 10BB אפקטיביים. UTG ו-HJ עשו פולד. אין עדיין רייז — התור עליכם.',
+ note:'ב-10BB אפקטיביים מ-CO טווח שאב סטנדרטי הוא רחב מאוד — רוב הידיים החזקות-בינוניות שאבות ישירות, בלי לפתוח בקטן. ההיגיון: ב-10BB אין מספיק עומק כדי לשחק פוסט-פלופ בצורה שמנצלת יתרון, וקול-דאון בפתיחה קטנה חושף אתכם ל-3-בט שאב מאחור. זו נקודת התחלה — התאימו לפי טווח השאב שאתם מלמדים בפועל.'},
+{id:'pf-sb-8bb-vs-open',title:'שאב-מעל מ-SB ב-8BB מול פתיחה',category:'pushfold',difficulty:'intermediate',n:6,sb:500,bb:1000,bba:0,button:0,
+ stacks:[25000,8000,22000,18000,10000,20000],street:'PREFLOP',preFolded:[3,5],facingRaise:{seat:4,to:2200},heroSeat:1,
+ setupText:'אתם ב-SB עם 8BB. HJ פתח ל-2,200 (2.2BB). CO ו-BTN עשו פולד. התור עליכם — BB עדיין מאחור.',
+ note:'ב-8BB אפקטיביים אין באמת "קול" — זו החלטה בין שאב-מעל (3-בט שאב) לפולד. פלטים שטוחים ב-8BB משאירים SPR נמוך מדי לשחק היטב פוסט-פלופ, ובנוסף BB עדיין מאחוריכם עלול להשלים את הסטאק. שווה להראות לתלמידים את ההבדל בין "יד שקוראים ב-20BB" ל"יד ששוקלים שאב איתה ב-8BB".'},
+{id:'pf-hu-12bb',title:'פתיחה בהד-אפ ב-12BB',category:'pushfold',difficulty:'beginner',n:2,sb:500,bb:1000,bba:0,button:0,
+ stacks:[12000,25000],street:'PREFLOP',preFolded:[],heroSeat:0,
+ setupText:'הד-אפ, אתם על הבאטן/SB עם 12BB. התור הראשון של היד עליכם.',
+ note:'הד-אפ ב-12BB אפקטיביים הוא כמעט תמיד שולחן push/fold — טווח הפתיחה מהבאטן רחב מאוד, לרוב יותר מ-70% מהידיים. זה מקום טוב להראות לתלמידים כמה שונה הד-אפ מ-6-מקס באותו עומק סטאק.'},
+
+{id:'tb-aq-vs-3bet',title:'AQ מול 3-בט',category:'threebet',difficulty:'intermediate',n:6,sb:500,bb:1000,bba:0,button:0,
+ stacks:[45000,40000,38000,50000,42000,38000],street:'PREFLOP',preFolded:[1,2],
+ facingRaise:{seat:0,to:6600},heroSeat:3,heroHole:['Ad','Qs'],
+ setupText:'פתחתם UTG ל-2,200. הבאטן עשה 3-בט ל-6,600. SB ו-BB עשו פולד. יש לכם AQ offsuit, כ-42BB אפקטיביים.',
+ note:'AQ מול 3-בט מכיסא מאוחר היא קלאסיקת "call vs 4-bet vs fold" — תלוי בטווח ה-3-בט של הווילן ובעומק. ברוב טבלאות ה-cash/MTT הסטנדרטיות זו קול קרוב, לפעמים 4-בט כבלוף/value מעורב. זו הזדמנות טובה להראות שהתשובה משתנה לפי טווח, לא רק לפי היד עצמה.'},
+{id:'tb-postflop-k72',title:'פוסט-פלופ אחרי 3-בט על K72',category:'threebet',difficulty:'advanced',n:6,sb:500,bb:1000,bba:0,button:0,
+ stacks:[44000,20200,38000,50000,42000,38000],street:'FLOP',board:['Kc','7d','2h'],
+ preFolded:[1,2,4,5],preBets:[6600,0,0,2200,0,0],heroSeat:0,actorSeat:3,
+ setupText:'עשיתם 3-בט מהבאטן ל-6,600, UTG (הפותח) קרא. הפלופ: K-7-2 קשת. UTG בתור לפעול ראשון (Out of Position).',
+ note:'K72 הוא בורד יבש שמעדיף מאוד את הטווח של ה-3-בטור (הרבה שילובים של קינגים ומצמדים גבוהים). כשאתם מלמדים את הצד של ה-OOP caller — שימו לב שהם צריכים check הרבה, וכשה-3-בטור מבצע c-bet קטן, הפעולה הסטנדרטית היא לרוב קול רחב עם פולד/רייז בקצוות.'},
+{id:'tb-4bet-aa',title:'AA מול 3-בט — 4-בט או שאב',category:'threebet',difficulty:'advanced',n:6,sb:500,bb:1000,bba:0,button:0,
+ stacks:[38000,42000,48000,42000,44000,20200],street:'PREFLOP',preFolded:[5,1,2],
+ heroSeat:3,heroHole:['As','Ac'],heroPriorBet:2200,facingRaise:{seat:4,to:6600},actorSeat:3,
+ setupText:'פתחתם UTG ל-2,200. HJ עשה 3-בט ל-6,600. CO, הבאטן, SB ו-BB עשו פולד. יש לכם AA, כ-42BB אפקטיביים.',
+ note:'AA מול 3-בט הוא כמעט תמיד 4-בט (או קול מתוכנן עם כוונת שאב פוסט-פלופ בעומק נמוך יותר) — אבל הערך הפדגוגי האמיתי כאן הוא בגודל ה-4-בט וביחס בינו לבין שאב מלא. עם 42BB, שאב מלא הוא לרוב עדיף על 4-בט קטן שמשאיר SPR מביך פוסט-פלופ. שווה להראות לתלמידים את חשבון ה-SPR, לא רק את זהות היד.'},
+
+{id:'icm-bubble-fold',title:'החלטת פתיחה על הבועה',category:'icm',difficulty:'intermediate',n:6,sb:1000,bb:2000,bba:2000,button:0,
+ stacks:[62000,18000,44000,26000,30000,20000],street:'PREFLOP',preFolded:[3,4],heroSeat:5,
+ setupText:'שלב בועה, 6 שחקנים בשולחן. אתם ב-CO עם 15BB, סטאק ממוצע. UTG ו-HJ עשו פולד. אין עדיין רייז.',
+ note:'על הבועה, שווי הצ׳יפים לא לינארי — הישרדות שווה יותר מכפי שהערך הכספי הנקוב מרמז, בעיקר לסטאקים הקצרים בשולחן (BTN עם 9BB כאן). כשאתם מלמדים ICM, שימו דגש: מול שחקן שעלול להתחסל, אפשר "לסחוט" אותו עם טווח שאב צר יותר משגרתי, כי הסיכון שלו לצאת מהטורניר גדול מהערך המיידי של הצ׳יפים.'},
+{id:'icm-shove-over-shortstack',title:'קול מול שאב של הסטאק הקצר',category:'icm',difficulty:'advanced',n:6,sb:1000,bb:2000,bba:2000,button:0,
+ stacks:[62000,44000,26000,30000,9000,20000],street:'PREFLOP',preFolded:[1,2,3],
+ facingRaise:{seat:4,to:9000},heroSeat:5,
+ setupText:'שלב בועה. HJ (9BB, הסטאק הכי קצר בשולחן) שאב את כל הצ׳יפים. אתם ב-CO עם 10BB. UTG/HJ עמדה קודמת ו-BTN עשו פולד לפניכם — רק אתם ו-BB עדיין מאחור.',
+ note:'זו בדיוק הנקודה ללמד ICM בפועל: קול נגד שאב של הסטאק הכי קצר בשולחן, על הבועה, דורש יד חזקה משמעותית יותר מקול "רגיל" ב-cEV, כי אם אתם מפסידים אתם עלולים להיות הבאים שמתחסלים. הראו לתלמידים את הפער בין "מה שהיד הזו שווה ב-cEV" ל"מה שהיא שווה ב-ICM".'},
+
+{id:'bb-defend-vs-minraise',title:'הגנת BB מול מין-רייז',category:'bbdefense',difficulty:'beginner',n:6,sb:500,bb:1000,bba:0,button:0,
+ stacks:[40000,38000,42000,44000,40000,38000],street:'PREFLOP',preFolded:[3,4,5],
+ facingRaise:{seat:0,to:2000},heroSeat:2,
+ setupText:'הכל עשו פולד עד הבאטן, שפתח מין-רייז ל-2BB. אתם ב-BB עם ~40BB. SB עשה פולד.',
+ note:'מול מין-רייז מהבאטן, ה-BB מקבל פוט-אודס מצוינים ותאורטית צריך להגן על טווח רחב מאוד — הרבה יותר רחב ממה שאינטואיטיבית מרגיש נכון לתלמידים מתחילים. זה מקום טוב להראות בפועל כמה ידיים "שוליות" הופכות לקול נכון כשהמחיר כל כך זול.'},
+{id:'bb-defend-vs-3x-btn',title:'הגנת BB מול פתיחת 3BB',category:'bbdefense',difficulty:'intermediate',n:6,sb:500,bb:1000,bba:0,button:0,
+ stacks:[40000,38000,42000,44000,40000,38000],street:'PREFLOP',preFolded:[3,4,5],
+ facingRaise:{seat:0,to:3000},heroSeat:2,
+ setupText:'הבאטן פתח ל-3BB (פתיחה סטנדרטית, לא מין-רייז). SB עשה פולד. אתם ב-BB עם ~40BB.',
+ note:'בהשוואה למין-רייז, פתיחה סטנדרטית ל-3BB מצמצמת את הפוט-אודס וגם את טווח ה-BB. שימושי להריץ את שני התרגילים (מול מין-רייז ומול 3BB) ברצף ולשאול את התלמידים אילו ידיים "נופלות" מהטווח כשהמחיר עולה.'},
+{id:'bb-checked-to',title:'Lead-bet כשה-BB פותח פעולה',category:'bbdefense',difficulty:'beginner',n:6,sb:500,bb:1000,bba:0,button:0,
+ stacks:[40000,38000,42000,44000,40000,38000],street:'FLOP',board:['9h','5c','2d'],
+ preFolded:[3,4,5],preBets:[0,0,0,0,0,0],heroSeat:2,actorSeat:2,
+ setupText:'SB עשה פולד פרה-פלופ, אתם ב-BB לימפ-צ׳ק. הפלופ: 9-5-2 קשת. אתם ראשונים לפעול.',
+ note:'בורד יבש כמו 9-5-2 מעדיף באופן קל את ה-BB (הטווח שלו רחב יותר מהאטאקר במצב לימפ-צ׳ק). זה מקום טוב ללמד lead-betting מבחירה כשהבורד לא מעדיף את היריב — אין כאן תשובה "נכונה" יחידה, אבל שווה לדון בתדירות ה-check מול lead.'}
+];
+// remove the placeholder tb-4bet-aa spot above (kept minimal deliberately — see note)
+SPOT_LIBRARY.splice(SPOT_LIBRARY.findIndex(s=>s.id==='tb-4bet-aa'),1);
+
+function switchTab(name){
+ $('tabbtnFree').classList.toggle('active',name==='free');
+ $('tabbtnLib').classList.toggle('active',name==='library');
+ $('tabbtnRemote').classList.toggle('active',name==='remote');
+ $('tabFree').classList.toggle('hidden',name!=='free');
+ $('tabLibrary').classList.toggle('hidden',name!=='library');
+ $('tabRemote').classList.toggle('hidden',name!=='remote');
+ if(name==='library'){renderLibrary();if($('libHistCount'))$('libHistCount').textContent=history.length?`(${history.length})`:''}
+ if(name==='remote')initRemoteTab();
+}
+function allSpots(){return SPOT_LIBRARY.concat(customSpots)}
+function renderLibFilters(){
+ $('libCatFilters').innerHTML=['all',...Object.keys(CATS)].map(k=>`<button type="button" class="chip-filter ${libCatFilter===k?'active':''}" onclick="libCatFilter='${k}';renderLibrary()">${k==='all'?'הכל':CATS[k]}</button>`).join('');
+ $('libDiffFilters').innerHTML=['all',...Object.keys(DIFFS)].map(k=>`<button type="button" class="chip-filter ${libDiffFilter===k?'active':''}" onclick="libDiffFilter='${k}';renderLibrary()">${k==='all'?'כל הרמות':DIFFS[k]}</button>`).join('');
+}
+function renderLibrary(){
+ renderLibFilters();
+ let spots=allSpots().filter(s=>(libCatFilter==='all'||s.category===libCatFilter)&&(libDiffFilter==='all'||s.difficulty===libDiffFilter));
+ if(!spots.length){$('libraryList').innerHTML='<p class="muted" style="font-size:12.5px">אין תרגילים בסינון הזה עדיין.</p>';return}
+ $('libraryList').innerHTML=spots.map(s=>`<div class="spotcard">
+   <div class="spotcard-top"><div><div class="spotcard-title">${s.title}</div><div class="spotcard-tags"><span class="tagpill">${CATS[s.category]}</span><span class="tagpill diff-${s.difficulty}">${DIFFS[s.difficulty]}</span><span class="tagpill">${s.n} שחקנים</span></div></div></div>
+   <div class="spotcard-desc">${s.setupText}</div>
+   <div class="spotcard-actions">
+     <button class="btn gold" onclick="loadSpot(allSpots().find(x=>x.id==='${s.id}'))">טען לשולחן</button>
+     ${customSpots.find(c=>c.id===s.id)?`<button class="btn ghost" onclick="deleteCustomSpot('${s.id}')">מחק</button>`:''}
+   </div>
+ </div>`).join('');
+}
+function deleteCustomSpot(id){customSpots=customSpots.filter(s=>s.id!==id);renderLibrary()}
+function saveHandAsSpot(handNo){
+ let h=history.find(x=>x.hand===handNo);if(!h)return;
+ let stacks=h.p.map((p,i)=>Math.round((p.stack||0)-(h.pay&&h.pay[i]||0)+(p.total||0)));
+ let spot={
+  id:'saved-'+Date.now(),
+  title:`יד שמורה #${h.hand}`,category:'other',difficulty:'intermediate',
+  n:h.n,sb:h.sb,bb:h.bb,bba:h.bba||0,button:h.button,stacks,
+  street:'PREFLOP',board:[],heroSeat:null,heroHole:null,preFolded:[],
+  setupText:`יד שנשמרה מתוך סשן אימון (יד מקורית #${h.hand}). כל השחקנים חוזרים לסטאק ההתחלתי המדויק שהיה להם בתחילת היד הזו.`,
+  note:'הערת מאמן: ערכו כאן את מה שרציתם להדגיש ביד הזו לפני שתשתמשו בה שוב.',
+  builtin:false
+ };
+ customSpots.push(spot);
+ toast('היד נשמרה לספריית התרגילים ✓');
+}
+
+function ensureSeatCount(n){
+ if(+$('num').value!==n){
+   let cur=+$('num').value,existing=Array.from({length:cur},(_,i)=>$('nm'+i)?.value).filter(Boolean);
+   $('num').value=String(n);renderPlayers();
+   existing.forEach((v,i)=>{if($('nm'+i))$('nm'+i).value=v});
+ }
+}
+function loadSpot(spot){
+ if(!spot)return;
+ ensureSeatCount(spot.n);
+ let names=Array.from({length:spot.n},(_,i)=>($('nm'+i)&&$('nm'+i).value.trim())||`Seat ${i+1}`);
+ G={n:spot.n,p:[],sb:spot.sb,bb:spot.bb,bba:spot.bba||0,mode:null,spotTitle:spot.title,button:spot.button,
+    hand:1,street:spot.street,board:(spot.board||[]).slice(),deck:deck(),pot:0,maxBet:0,lastFullRaise:spot.bb,
+    current:null,acted:new Set(),fullSeq:0,lastActSeq:Array(spot.n).fill(-1),lastFacing:Array(spot.n).fill(null),
+    paused:false,ended:false,log:[`תרגיל: ${spot.title}`],decision:0,turnLeft:0,auto:false,isSpot:true,currentSpot:spot};
+ G.p=Array.from({length:spot.n},(_,i)=>({name:names[i],stack:spot.stacks[i],bet:0,total:0,hole:[],fold:false,allin:false,busted:false}));
+ G.p.forEach(q=>{q.hole=[G.deck.pop(),G.deck.pop()]});
+ if(spot.heroSeat!=null&&spot.heroHole)G.p[spot.heroSeat].hole=spot.heroHole.slice();
+ (spot.preFolded||[]).forEach(i=>{G.p[i].fold=true});
+ if(spot.street==='PREFLOP'){
+   let {sb,bb}=currentBlindSeats();
+   if(G.bba)contrib(bb,G.bba,false);
+   contrib(sb,G.sb,true);contrib(bb,G.bb,true);
+   G.maxBet=Math.max(G.p[sb].bet,G.p[bb].bet);
+ }else{
+   (spot.preBets||[]).forEach((amt,i)=>{if(amt)contrib(i,amt,false)});
+ }
+ if(spot.heroPriorBet&&spot.heroSeat!=null){contrib(spot.heroSeat,spot.heroPriorBet,true)}
+ if(spot.facingRaise){
+   let r=spot.facingRaise,oldMax=G.maxBet,delta=r.to-G.p[r.seat].bet;
+   contrib(r.seat,delta,true);
+   G.lastFullRaise=r.to-oldMax;G.maxBet=G.p[r.seat].bet;
+   G.fullSeq++;G.acted=new Set();mark(r.seat);
+ }
+ G.current=spot.actorSeat!=null?spot.actorSeat:(spot.heroSeat!=null?spot.heroSeat:0);
+ wasShown={};revealSeat=null;handPotTrail=[];
+ $('lobby').classList.add('hidden');$('game').classList.remove('hidden');$('exitBtn').classList.remove('hidden');$('hudmini').classList.remove('hidden');$('topStatus').classList.add('hidden');
+ render();
+ $('privName').textContent=G.p[G.current].name;
+ $('privacy').classList.add('open');beep();
+}
+function backToLobby(){clearInterval(timer);clearInterval(levelTimer);G=null;$('privacy').classList.remove('open');$('exitBtn').classList.add('hidden');$('hudmini').classList.add('hidden');$('topStatus').classList.remove('hidden');$('game').classList.add('hidden');$('lobby').classList.remove('hidden');switchTab('free')}
+function confirmBackToLobby(){
+ $('historyBox').innerHTML=`<h2>יציאה מהשולחן</h2><p class="muted">ההתקדמות בסשן הנוכחי תימחק. להמשיך?</p>
+   <div style="display:flex;gap:8px;margin-top:16px">
+     <button class="btn red" onclick="closeModal('historyModal');${`if(remoteMode){leaveRoom()}else{backToLobby()}`}">כן, לצאת</button>
+     <button class="btn ghost" onclick="closeModal('historyModal')">ביטול</button>
+   </div>`;
+ $('historyModal').classList.add('open');
+}
+function showSpotDebrief(){
+ let s=G.currentSpot;if(!s){$('exitBtn').classList.add('hidden');$('hudmini').classList.add('hidden');$('topStatus').classList.remove('hidden');$('game').classList.add('hidden');$('lobby').classList.remove('hidden');return}
+ $('historyBox').innerHTML=`<h2>${s.title}</h2>
+   <div class="debrief-setup"><b>המצב שהוצג:</b> ${s.setupText}</div>
+   <div class="debrief-note"><b>נקודת ההוראה:</b><br>${s.note}</div>
+   <div class="dl-title" style="margin-top:6px">מה שקרה בפועל</div>
+   <div class="log">${G.log.map(x=>`<div>${x}</div>`).join('')}</div>
+   <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap">
+     <button class="btn gold" onclick="closeModal('historyModal');loadSpot(G.currentSpot)">שחקו שוב</button>
+     <button class="btn ghost" onclick="closeModal('historyModal');backToLobby()">חזרה לספרייה</button>
+   </div>`;
+ $('historyModal').classList.add('open');
+}
+
+/* ---- spot builder (custom spots) ---- */
+function openSpotBuilder(editId){
+ editingSpotId=editId||null;
+ let s=editId?allSpots().find(x=>x.id===editId):null;
+ let n=s?s.n:6;
+ $('historyBox').innerHTML=`<h2>${s?'עריכת תרגיל':'תרגיל חדש'}</h2>
+  <div class="builder-form">
+   <div class="full"><label>כותרת</label><input id="bTitle" value="${s?s.title:''}"></div>
+   <div class="full builder-section">מבנה השולחן</div>
+   <div><label>קטגוריה</label><select id="bCat">${Object.keys(CATS).map(k=>`<option value="${k}" ${s&&s.category===k?'selected':''}>${CATS[k]}</option>`).join('')}</select></div>
+   <div><label>רמת קושי</label><select id="bDiff">${Object.keys(DIFFS).map(k=>`<option value="${k}" ${s&&s.difficulty===k?'selected':''}>${DIFFS[k]}</option>`).join('')}</select></div>
+   <div><label>מספר שחקנים</label><select id="bN" onchange="renderBuilderStacks()"><option value="8" ${n===8?'selected':''}>8</option><option value="6" ${n===6?'selected':''}>6</option><option value="4" ${n===4?'selected':''}>4</option><option value="2" ${n===2?'selected':''}>2</option></select></div>
+   <div><label>עמדת באטן (Seat #, 0=Seat1)</label><input id="bButton" type="number" min="0" value="${s?s.button:0}"></div>
+   <div><label>Small Blind</label><input id="bSB" type="number" value="${s?s.sb:500}"></div>
+   <div><label>Big Blind</label><input id="bBB" type="number" value="${s?s.bb:1000}"></div>
+   <div><label>אנטה (BBA, אופציונלי)</label><input id="bBBA" type="number" value="${s?s.bba||0:0}"></div>
+   <div class="full stackgrid" id="bStacks"></div>
+
+   <div class="full builder-section">מצב היד</div>
+   <div><label>רחוב פתיחה</label><select id="bStreet" onchange="renderBuilderStacks()"><option value="PREFLOP" ${!s||s.street==='PREFLOP'?'selected':''}>Preflop</option><option value="FLOP" ${s&&s.street==='FLOP'?'selected':''}>Flop</option><option value="TURN" ${s&&s.street==='TURN'?'selected':''}>Turn</option><option value="RIVER" ${s&&s.street==='RIVER'?'selected':''}>River</option></select></div>
+   <div><label>שחקן ה-Hero (Seat #)</label><input id="bHero" type="number" min="0" value="${s&&s.heroSeat!=null?s.heroSeat:''}"></div>
+   <div class="full"><label>בורד (לא רלוונטי ב-Preflop) — למשל: Kc 7d 2h</label><input id="bBoard" value="${s&&s.board?s.board.join(' '):''}"></div>
+   <div><label>קלפי Hero (אופציונלי) — למשל: As Kd</label><input id="bHeroCards" value="${s&&s.heroHole?s.heroHole.join(' '):''}"></div>
+   <div><label>מי פועל ראשון (Seat #, ריק=Hero)</label><input id="bActor" value="${s&&s.actorSeat!=null?s.actorSeat:''}"></div>
+   <div class="full"><label>מי כבר עשה פולד (Seats, מופרד בפסיקים)</label><input id="bFolded" value="${s&&s.preFolded?s.preFolded.join(','):''}"></div>
+   <div class="full"><label>מצב מולו (רייז שכבר קרה ברחוב הזה — אופציונלי)</label>
+     <div style="display:flex;gap:8px"><input id="bFrSeat" placeholder="Seat של הרייזר" type="number" style="flex:1"><input id="bFrTo" placeholder="Raise to (צ׳יפים)" type="number" style="flex:1"></div>
+   </div>
+   <div class="full"><label>הימור קודם של ה-Hero ברחוב הזה (אופציונלי, למשל אם הוא זה שפתח)</label><input id="bHeroPrior" type="number" value="${s&&s.heroPriorBet?s.heroPriorBet:''}"></div>
+
+   <div class="full builder-section">תיאור לתלמידים</div>
+   <div class="full"><label>תיאור המצב לתלמידים</label><textarea id="bSetup">${s?s.setupText:''}</textarea></div>
+   <div class="full"><label>הערת מאמן (מוצגת בסיכום אחרי היד — זו הדעה שלכם)</label><textarea id="bNote">${s?s.note:''}</textarea></div>
+  </div>
+  <div style="display:flex;gap:8px;margin-top:16px">
+   <button class="btn gold" onclick="saveSpot()">שמירה</button>
+   <button class="btn ghost" onclick="closeModal('historyModal')">ביטול</button>
+  </div>`;
+ $('historyModal').classList.add('open');
+ renderBuilderStacks(s);
+}
+function renderBuilderStacks(s){
+ let n=+$('bN').value;s=s&&typeof s==='object'&&s.stacks?s:null;
+ $('bStacks').innerHTML=Array.from({length:n},(_,i)=>`<div class="field"><label>סטאק Seat ${i+1}</label><input id="bStack${i}" type="number" value="${s&&s.stacks[i]?s.stacks[i]:20000}"></div>`).join('');
+}
+function saveSpot(){
+ let n=+$('bN').value,street=$('bStreet').value;
+ let title=$('bTitle').value.trim()||'תרגיל ללא שם';
+ let board=$('bBoard').value.trim()?$('bBoard').value.trim().split(/[ ,]+/).filter(Boolean):[];
+ let heroSeatVal=$('bHero').value.trim();
+ let heroCards=$('bHeroCards').value.trim()?$('bHeroCards').value.trim().split(/[ ,]+/).filter(Boolean):null;
+ let folded=$('bFolded').value.trim()?$('bFolded').value.trim().split(',').map(x=>+x.trim()).filter(x=>!isNaN(x)):[];
+ let actorVal=$('bActor').value.trim();
+ let frSeat=$('bFrSeat').value.trim(),frTo=$('bFrTo').value.trim();
+ let heroPrior=$('bHeroPrior').value.trim();
+ let stacks=Array.from({length:n},(_,i)=>+($('bStack'+i).value||20000));
+ let spot={
+   id:editingSpotId||('custom-'+Date.now()),
+   title,category:$('bCat').value,difficulty:$('bDiff').value,n,
+   sb:+$('bSB').value||500,bb:+$('bBB').value||1000,bba:+$('bBBA').value||0,
+   button:+$('bButton').value||0,stacks,street,board,
+   heroSeat:heroSeatVal!==''?+heroSeatVal:null,
+   heroHole:heroCards,preFolded:folded,
+   actorSeat:actorVal!==''?+actorVal:null,
+   preBets:street!=='PREFLOP'?Array.from({length:n},()=>0):undefined,
+   facingRaise:(frSeat!==''&&frTo!=='')?{seat:+frSeat,to:+frTo}:undefined,
+   heroPriorBet:heroPrior!==''?+heroPrior:undefined,
+   setupText:$('bSetup').value.trim(),note:$('bNote').value.trim(),builtin:false
+ };
+ if(editingSpotId){let idx=customSpots.findIndex(x=>x.id===editingSpotId);if(idx>=0)customSpots[idx]=spot;else customSpots.push(spot)}
+ else customSpots.push(spot);
+ editingSpotId=null;closeModal('historyModal');switchTab('library');
+}
+function exportLibrary(){
+ let blob=new Blob([JSON.stringify(customSpots,null,2)],{type:'application/json'});
+ let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='outplay-spots.json';a.click();URL.revokeObjectURL(a.href);
+}
+function importLibrary(ev){
+ let file=ev.target.files[0];if(!file)return;
+ let reader=new FileReader();
+ reader.onload=()=>{try{let arr=JSON.parse(reader.result);if(Array.isArray(arr)){arr.forEach(s=>{if(s&&s.id&&!customSpots.find(c=>c.id===s.id))customSpots.push(s)});renderLibrary();toast(`יובאו ${arr.length} תרגילים.`)}}catch(e){toast('קובץ לא תקין.')}};
+ reader.readAsText(file);ev.target.value='';
+}
+
+function aliveIds(){return G.p.map((q,i)=>q.stack>0?i:null).filter(x=>x!==null)}function nextSeat(i,actable=false){for(let k=1;k<=G.n;k++){let j=(i+k)%G.n,q=G.p[j];if(q.stack>0&&(!actable||(!q.fold&&!q.allin)))return j}return null}
+function contrib(i,amt,live=true){let q=G.p[i],v=Math.max(0,Math.min(q.stack,amt));q.stack-=v;q.total+=v;G.pot+=v;if(live)q.bet+=v;if(q.stack===0)q.allin=true;return v}
+function currentBlindSeats(){let a=aliveIds(),sb,bb;if(a.length===2){sb=G.button;bb=nextSeat(sb)}else{sb=nextSeat(G.button);bb=nextSeat(sb)}return{sb,bb}}
+function startSession(){let n=+$('num').value,m=MODES[sel],base=m[3]*m[2];G={n,p:[],sb:m[1],bb:m[2],bba:+$('ante').value?m[2]:0,mode:sel,button:ri(n),hand:0,street:'WAITING',board:[],deck:[],pot:0,maxBet:0,lastFullRaise:m[2],current:null,acted:new Set(),fullSeq:0,lastActSeq:Array(n).fill(-1),lastFacing:Array(n).fill(null),paused:false,ended:false,log:[],decision:+$('clock').value,turnLeft:+$('clock').value,auto:+$('auto').value};
+ let multipliers;
+ if(sel.startsWith('b')||sel==='ft40'){
+   // Varied stacks (bubble / final table): spread evenly from 0.55x to 1.5x of the
+   // target depth, generated for whatever n is - must never fall through to a
+   // shorter array or seats end up with undefined stacks.
+   let lo=0.55,hi=1.5;
+   multipliers=n===1?[1]:Array.from({length:n},(_,i)=>+(lo+(hi-lo)*(i/(n-1))).toFixed(3));
+ } else {
+   multipliers=Array(n).fill(1);
+ }
+ sh(multipliers);
+ G.p=Array.from({length:n},(_,i)=>({name:$('nm'+i).value.trim()||`Player ${i+1}`,stack:Math.round(base*(multipliers[i]||1)),bet:0,total:0,hole:[],fold:false,allin:false,busted:false}));
+ history=[];$('lobby').classList.add('hidden');$('game').classList.remove('hidden');$('exitBtn').classList.remove('hidden');$('hudmini').classList.remove('hidden');$('topStatus').classList.add('hidden');newHand();clearInterval(timer);timer=setInterval(tick,1000)
+ soundOn=+($('sound')?.value||0)===1;wasShown={};try{if(soundOn)ensureAudio();}catch(e){}
+ if($('soloBots')&&$('soloBots').value==='1'){let humanSeat=+($('soloSeat')?.value||0);G.botSeats=Array.from({length:n},(_,i)=>i).filter(i=>i!==humanSeat)}else{G.botSeats=[]}
+ botScheduledFor=null;clearTimeout(botTimer);
+ playerStats={};statsProcessedHands=0;
+ G.bountyOn=$('tourneyFormat')&&$('tourneyFormat').value==='1';
+ if(G.bountyOn){
+  let usdAmount=Math.max(1,+($('bountyAmountUSD')?.value||20));
+  // Each seat can carry its own bounty (real bounty tournaments work this way -
+  // a player who has knocked others out carries a larger bounty on their head).
+  G.bounty=Array.from({length:n},(_,i)=>{
+    let el=$('bountySeat'+i);
+    let v=el?+el.value:NaN;
+    return (isNaN(v)||v<0)?usdAmount:Math.round(v);
+  });
+  G.bountiesWon=Array(n).fill(0);G.bustedTracked=Array(n).fill(false);
+ }
+ HAND_REVIEW_MS=+($('reviewMs')?.value||4000);
+ G.levelMinutes=+($('levelMin')?.value||0);
+ if(G.levelMinutes>0){G.levels=buildLevels(G.sb,G.bb,G.bba);G.levelIdx=0;G.levelSeconds=G.levelMinutes*60}else{G.levels=null;G.levelIdx=0;G.levelSeconds=0}
+ clearInterval(levelTimer);if(G.levelMinutes>0)levelTimer=setInterval(levelTick,1000);
+ try{if('wakeLock' in navigator)navigator.wakeLock.request('screen').catch(()=>{})}catch(e){}
+}
+function newHand(){if(G.isSpot){showSpotDebrief();return}if(G.ended)return;let alive=aliveIds();if(alive.length<=1)return finishTournament(alive[0]);if(!alive.includes(G.button))G.button=alive[0];G.hand++;G.street='PREFLOP';G.board=[];G.deck=deck();G.pot=0;G.maxBet=0;G.lastFullRaise=G.bb;G.acted=new Set();G.fullSeq=0;G.lastActSeq=Array(G.n).fill(-1);G.lastFacing=Array(G.n).fill(null);G.log=[`Hand #${G.hand}`];revealSeat=null;
+ G.p.forEach(q=>{q.bet=0;q.total=0;q.fold=q.stack<=0;q.allin=false;q.hole=q.stack>0?[G.deck.pop(),G.deck.pop()]:[]});
+ let {sb,bb}=currentBlindSeats();if(G.bba)contrib(bb,G.bba,false);contrib(sb,G.sb,true);contrib(bb,G.bb,true);G.maxBet=Math.max(G.p[sb].bet,G.p[bb].bet);G.current=alive.length===2?G.button:nextSeat(bb,true);G.turnLeft=G.decision;wasShown={};handPotTrail=[];render();privacy()
+}
+function callAmt(i){return Math.max(0,G.maxBet-G.p[i].bet)}function minRaiseTo(){return G.maxBet===0?G.bb:G.maxBet+G.lastFullRaise}
+function canRaise(i){let q=G.p[i],c=callAmt(i);if(q.fold||q.allin||q.stack<=c)return false;if(!G.acted.has(i))return true;if(G.lastActSeq[i]<G.fullSeq)return true;let faced=G.lastFacing[i]??G.maxBet;return(G.maxBet-faced)>=G.lastFullRaise}
+function mark(i){G.acted.add(i);G.lastFacing[i]=G.maxBet;G.lastActSeq[i]=G.fullSeq}
+function validateRaise(i,target){let q=G.p[i],all=q.bet+q.stack;target=Math.min(all,Math.round(Number(target)||0));if(!canRaise(i))return{ok:false};if(G.maxBet===0){let full=target>=G.bb;if(!full&&target<all)return{ok:false};return{ok:target>0,target,inc:target,full}}if(target<=G.maxBet)return{ok:false};let inc=target-G.maxBet,full=inc>=G.lastFullRaise;if(!full&&target<all)return{ok:false};return{ok:true,target,inc,full}}
+function act(type,target){if(G.paused||G.ended||G.current==null||revealSeat!==G.current)return;let i=G.current,q=G.p[i],c=callAmt(i);
+ if(type==='fold'){q.fold=true;mark(i);G.log.push(`${q.name} folds`)}
+ if(type==='call'){let x=contrib(i,c,true);G.log.push(c?`${q.name} calls ${fmt(x)}${q.allin?' all-in':''}`:`${q.name} checks`);mark(i)}
+ if(type==='jam'){let all=q.bet+q.stack;if(all<=G.maxBet){let x=contrib(i,c,true);G.log.push(`${q.name} calls ${fmt(x)} all-in`);mark(i)}else{let v=validateRaise(i,all);if(!v.ok)return;if(v.full){G.lastFullRaise=v.inc;G.fullSeq++;G.acted=new Set()}contrib(i,v.target-q.bet,true);G.maxBet=q.bet;mark(i);G.log.push(`${q.name} all-in to ${fmt(q.bet)}`)}}
+ if(type==='raise'){let v=validateRaise(i,target);if(!v.ok){toast('Raise לא חוקי');return}if(v.full){G.lastFullRaise=v.inc;G.fullSeq++;G.acted=new Set()}contrib(i,v.target-q.bet,true);G.maxBet=q.bet;mark(i);G.log.push(`${q.name} ${G.maxBet===v.target?'raises to':'bets'} ${fmt(q.bet)}`)}
+ revealSeat=null;advance()
+}
+function actors(){return G.p.map((q,i)=>({q,i})).filter(x=>!x.q.fold&&!x.q.allin&&x.q.stack>0)}function liveIds(){return G.p.map((q,i)=>!q.fold?i:null).filter(x=>x!==null)}
+function roundDone(){let a=actors();return !a.length||a.every(x=>G.acted.has(x.i)&&x.q.bet===G.maxBet)}
+function noBetPossible(){let a=actors();return a.length===0||(a.length===1&&callAmt(a[0].i)===0)}
+function advance(){let live=liveIds();if(live.length===1)return awardFold(live[0]);if(roundDone()){if(noBetPossible())return runout();return nextStreet()}G.current=nextSeat(G.current,true);G.turnLeft=G.decision;render();privacy()}
+function dealBoard(n){G.deck.pop();for(let k=0;k<n;k++)G.board.push(G.deck.pop())}
+function nextStreet(){G.p.forEach(q=>q.bet=0);G.maxBet=0;G.lastFullRaise=G.bb;G.acted=new Set();G.fullSeq=0;G.lastActSeq=Array(G.n).fill(-1);G.lastFacing=Array(G.n).fill(null);
+ if(G.street==='PREFLOP'){dealBoard(3);G.street='FLOP'}else if(G.street==='FLOP'){dealBoard(1);G.street='TURN'}else if(G.street==='TURN'){dealBoard(1);G.street='RIVER'}else return showdown();
+ if(noBetPossible())return runout();G.current=nextSeat(G.button,true);G.turnLeft=G.decision;G.log.push(G.street);render();privacy()
+}
+function runout(){while(G.board.length<5)dealBoard(G.board.length===0?3:1);showdown()}
+function comb5(a){let o=[];for(let i=0;i<a.length-4;i++)for(let j=i+1;j<a.length-3;j++)for(let k=j+1;k<a.length-2;k++)for(let l=k+1;l<a.length-1;l++)for(let m=l+1;m<a.length;m++)o.push([a[i],a[j],a[k],a[l],a[m]]);return o}
+function rank5(cs){let rs=cs.map(c=>'23456789TJQKA'.indexOf(c[0])+2).sort((a,b)=>b-a),cnt={};rs.forEach(r=>cnt[r]=(cnt[r]||0)+1);let u=[...new Set(rs)].sort((a,b)=>b-a);if(u[0]===14)u.push(1);let st=0;for(let i=0;i<=u.length-5;i++)if(u[i]-u[i+4]===4){st=u[i];break}let fl=cs.every(c=>c[1]===cs[0][1]),g=Object.entries(cnt).map(([r,c])=>[+c,+r]).sort((a,b)=>b[0]-a[0]||b[1]-a[1]);if(fl&&st)return[8,st];if(g[0][0]===4)return[7,g[0][1],g[1][1]];if(g[0][0]===3&&g[1]?.[0]>=2)return[6,g[0][1],g[1][1]];if(fl)return[5,...rs];if(st)return[4,st];if(g[0][0]===3)return[3,g[0][1],...g.slice(1).map(x=>x[1]).sort((a,b)=>b-a).slice(0,2)];if(g[0][0]===2&&g[1]?.[0]===2){let ps=[g[0][1],g[1][1]].sort((a,b)=>b-a),k=g.filter(x=>x[0]===1).map(x=>x[1]).sort((a,b)=>b-a)[0]||0;return[2,...ps,k]}if(g[0][0]===2)return[1,g[0][1],...g.filter(x=>x[0]===1).map(x=>x[1]).sort((a,b)=>b-a).slice(0,3)];return[0,...rs.slice(0,5)]}
+function cmp(a,b){for(let i=0;i<Math.max(a.length,b.length);i++){let d=(a[i]||0)-(b[i]||0);if(d)return d}return 0}function best7(cs){let b=null;for(let c of comb5(cs)){let r=rank5(c);if(!b||cmp(r,b)>0)b=r}return b}
+function showdown(){while(G.board.length<5)dealBoard(G.board.length===0?3:1);let levels=[...new Set(G.p.map(q=>q.total).filter(x=>x>0))].sort((a,b)=>a-b),prev=0,pay=Array(G.n).fill(0);
+ for(let lev of levels){let contributors=G.p.map((q,i)=>({q,i})).filter(x=>x.q.total>=lev),amt=(lev-prev)*contributors.length,eligible=contributors.filter(x=>!x.q.fold),br=null,w=[];for(let x of eligible){let r=best7([...x.q.hole,...G.board]);if(!br||cmp(r,br)>0){br=r;w=[x.i]}else if(cmp(r,br)===0)w.push(x.i)}if(w.length){let each=Math.floor(amt/w.length),rem=amt-each*w.length;w.forEach((i,k)=>pay[i]+=each+(k===0?rem:0))}prev=lev}
+ pay.forEach((x,i)=>G.p[i].stack+=x);G.log.push(pay.map((x,i)=>x?`${G.p[i].name} +${fmt(x)}`:null).filter(Boolean).join(' · '));finishHand(pay)}
+function awardFold(i){let p=G.pot;G.p[i].stack+=p;G.log.push(`${G.p[i].name} wins ${fmt(p)}`);finishHand(G.p.map((_,k)=>k===i?p:0))}
+function finishHand(pay){
+ history.push(JSON.parse(JSON.stringify({hand:G.hand,board:G.board,p:G.p,log:G.log,pay,button:G.button,n:G.n,sb:G.sb,bb:G.bb,bba:G.bba})));
+ G.street='SHOWDOWN';G.current=null;G.pot=0;
+ G.p.forEach(q=>{if(q.stack<=0)q.busted=true});
+ // Build a readable summary of who won and with what, shown while the table sits
+ // on the finished hand - at 0.9s there was no time to read the board or the
+ // opponent's cards before the next hand wiped it.
+ let winners=pay.map((v,i)=>v>0?{i,v}:null).filter(Boolean);
+ if(winners.length){
+   G.handResult=winners.map(w=>`${G.p[w.i].name} +${fmtChip(w.v)}`).join(' · ');
+ } else G.handResult=null;
+ render();
+ if(aliveIds().length<=1)return finishTournament(aliveIds()[0]);
+ if(G.auto&&!G.paused)setTimeout(()=>{if(!G.paused&&!G.ended){G.handResult=null;G.button=nextSeat(G.button);newHand()}},HAND_REVIEW_MS);
+}
+function finishTournament(i){G.ended=true;G.current=null;render();if(G.isSpot){showSpotDebrief();return}$('endTitle').textContent=i!=null?`${G.p[i].name} ניצח/ה את הסשן`:'הסשן הושלם';$('endModal').classList.add('open')}
+function privacy(){if(G.current==null||G.ended)return;revealSeat=null;if(remoteMode)return;if(G.botSeats&&G.botSeats.includes(G.current))return;$('privName').textContent=G.p[G.current].name;$('privacy').classList.add('open');beep()}
+function reveal(){revealSeat=G.current;$('privacy').classList.remove('open');render()}
+function togglePause(){G.paused=!G.paused;render()}function nextManual(){if(G.street==='SHOWDOWN'&&!G.ended){G.button=nextSeat(G.button);newHand()}}
+function tick(){if(!G||G.paused||G.ended||G.current==null||!G.decision)return;G.turnLeft--;if(G.turnLeft<=0){revealSeat=G.current;act('fold')}else render()}
+let raiseDecisionKey=null, raiseCurrentVal=null;
+let handPotTrail=[], replayShowBB=false, potTrailByHand={}, liveShowBB=false;
+let playerStats={}, statsProcessedHands=0;
+function updateStatsFromHistory(){
+ while(statsProcessedHands<history.length){
+  let h=history[statsProcessedHands];
+  let preflopActs={};
+  for(let line of h.log){
+   if(line==='FLOP'||line==='TURN'||line==='RIVER')break;
+   let m=line.match(/^(.+?) (calls|raises to|bets|checks|folds)/);
+   if(m){if(!preflopActs[m[1]])preflopActs[m[1]]=[];preflopActs[m[1]].push(m[2])}
+  }
+  h.p.forEach((p,i)=>{
+   if(!playerStats[i])playerStats[i]={hands:0,vpip:0,pfr:0};
+   playerStats[i].hands++;
+   let acts=preflopActs[p.name]||[];
+   if(acts.some(t=>t==='calls'||t==='raises to'||t==='bets'))playerStats[i].vpip++;
+   if(acts.some(t=>t==='raises to'||t==='bets'))playerStats[i].pfr++;
+  });
+  statsProcessedHands++;
+ }
+}
+function toggleLiveUnit(){liveShowBB=!liveShowBB;render()}
+
+/* ================= SOLO PRACTICE BOTS =================
+   Heuristic decision-making, position- and stack-depth-aware, with basic
+   continuation-betting logic. This is NOT a GTO solver and makes no claim
+   to game-theory-optimal play - it's a practice partner that plays sensible,
+   somewhat-varied poker so you have something real to react to. */
+let botTimer=null,botScheduledFor=null,handAggressor=null,botLogSeen=0;
+function trackAggression(){
+ if(!G)return;
+ for(let i=botLogSeen;i<G.log.length;i++){
+   let m=G.log[i].match(/^(.+?) (raises to|bets|all-in to)/);
+   if(m){let seat=G.p.findIndex(p=>p.name===m[1]);if(seat>=0)handAggressor=seat}
+ }
+ botLogSeen=G.log.length;
+}
+// Simplified starting-hand tier chart (0=trash .. 6=premium). Not a solved range,
+// but a real, recognizable classification (pairs/broadways/suited connectors),
+// far more accurate than a single high-card formula.
+function preflopTier(r1,r2,suited){
+ let hi=Math.max(r1,r2),lo=Math.min(r1,r2),paired=r1===r2,gap=hi-lo;
+ if(paired){
+   if(hi>=13)return 6; if(hi>=11)return 5; if(hi>=9)return 4;
+   if(hi>=7)return 3; if(hi>=5)return 2; return 1;
+ }
+ if(hi===14){
+   if(lo>=13)return suited?6:5;
+   if(lo>=11)return suited?5:4;
+   if(lo>=9)return suited?4:3;
+   if(lo>=6)return suited?3:2;
+   return suited?2:1;
+ }
+ if(hi===13){
+   if(lo>=11)return suited?5:4;
+   if(lo>=9)return suited?3:2;
+   return suited?2:1;
+ }
+ if(hi===12){
+   if(lo>=10)return suited?4:3;
+   if(lo>=9)return suited?2:1;
+   return suited?1:0;
+ }
+ if(hi===11){
+   if(lo>=9)return suited?3:2;
+   return suited?1:0;
+ }
+ if(gap===1&&hi>=6)return suited?3:1;
+ if(gap===1)return suited?2:0;
+ if(gap===2&&suited&&hi>=6)return 2;
+ return 0;
+}
+const TIER_STRENGTH=[0.12,0.28,0.40,0.53,0.66,0.80,0.93];
+// Detects drawing potential, which the made-hand ranker is blind to. A flush draw
+// or open-ender is a hand real players bet and raise with - treating it as high
+// card (the old behaviour) made the bots fold every draw and never semi-bluff.
+function drawStrength(hole,board){
+ if(board.length<3||board.length>4)return 0;      // only flop/turn have draw equity
+ let all=[...hole,...board];
+ let suits={},ranks='23456789TJQKA';
+ all.forEach(c=>{suits[c[1]]=(suits[c[1]]||0)+1});
+ let maxSuit=Math.max(...Object.values(suits));
+ let holeSuits={};hole.forEach(c=>holeSuits[c[1]]=(holeSuits[c[1]]||0)+1);
+ let flushDraw=false;
+ for(let s in suits){ if(suits[s]===4&&holeSuits[s]>=1) flushDraw=true; }
+ // straight draws
+ let vals=[...new Set(all.map(c=>ranks.indexOf(c[0])))].sort((a,b)=>a-b);
+ if(vals.includes(12))vals.unshift(-1);           // wheel ace
+ let oesd=false,gut=false;
+ for(let lo=-1;lo<=8;lo++){
+   let window=[lo,lo+1,lo+2,lo+3,lo+4];
+   let have=window.filter(v=>vals.includes(v)).length;
+   if(have===4){
+     // 4 to a straight: open-ended if the missing card is at either end
+     let missing=window.find(v=>!vals.includes(v));
+     if(missing===window[0]||missing===window[4])oesd=true; else gut=true;
+   }
+ }
+ let d=0;
+ if(flushDraw)d=Math.max(d,0.34);
+ if(oesd)d=Math.max(d,0.30);
+ if(gut)d=Math.max(d,0.13);
+ if(flushDraw&&(oesd||gut))d=0.46;                // monster combo draw
+ return d;
+}
+function botHandStrength(seat){
+ let q=G.p[seat];
+ if(G.board.length>=3){
+   let r=best7([...q.hole,...G.board]);
+   // Map made-hand categories onto a realistic strength scale. The old formula
+   // (rank/7) compressed everything: a set scored 0.43 and a flush 0.71, so bots
+   // folded sets and trips to ordinary bets. These values reflect how strong each
+   // category actually plays.
+   const MADE=[0.08,0.25,0.55,0.75,0.85,0.90,0.95,0.99];
+   let made=MADE[Math.min(7,r[0])];
+   // Differentiate pair quality: top pair plays very differently from bottom pair,
+   // but the raw category ranker scores them identically.
+   if(r[0]===1){
+     let ranks='23456789TJQKA';
+     let bv=G.board.map(c=>ranks.indexOf(c[0]));
+     let hv=q.hole.map(c=>ranks.indexOf(c[0]));
+     let top=Math.max(...bv);
+     let paired=hv.find(v=>bv.includes(v));
+     if(paired!==undefined){
+       if(paired===top)made+=0.22;                        // top pair
+       else if(paired>=bv.sort((a,b)=>b-a)[1])made+=0.10;  // middle pair
+     } else if(hv[0]===hv[1]){
+       made+=(hv[0]>top?0.26:0.06);                        // over-pair vs under-pair
+     }
+   }
+   // High-card hands get a little credit for a strong ace/king kicker
+   if(r[0]===0){
+     let ranks='23456789TJQKA';
+     let hi=Math.max(...q.hole.map(c=>ranks.indexOf(c[0])));
+     if(hi===12)made+=0.10; else if(hi===11)made+=0.05;
+   }
+   // Fold in draw equity - a big draw is worth betting and raising with
+   let draw=drawStrength(q.hole,G.board);
+   return Math.max(0,Math.min(1,Math.max(made,draw*0.9+made*0.35)));
+ }
+ let ranks='23456789TJQKA',r1=ranks.indexOf(q.hole[0][0])+2,r2=ranks.indexOf(q.hole[1][0])+2;
+ let suited=q.hole[0][1]===q.hole[1][1];
+ return TIER_STRENGTH[preflopTier(r1,r2,suited)];
+}
+// Position-and-depth-aware preflop opening threshold: tighter from early position,
+// wider on the button, wider still (push/fold) when short-stacked. Not a real
+// solved range chart - a reasonable approximation for training purposes.
+function positionOpenThreshold(seat){
+ let n=G.n,off=(seat-G.button+n)%n,seatsAfter=n-1-off;
+ let base=0.30+Math.min(0.26,seatsAfter*0.045);
+ let bbDepth=G.p[seat].stack/G.bb;
+ if(bbDepth<20)base-=0.06;
+ if(bbDepth<12)base-=0.10;
+ return Math.max(0.24,Math.min(0.80,base));
+}
+// How "dry" the board is: 1 = bone dry (attack it), 0 = very coordinated.
+// Real players steal far more often on boards that missed everyone.
+function boardDryness(){
+ let b=G.board;
+ if(!b||b.length<3)return 0.5;
+ let ranks='23456789TJQKA';
+ let vals=b.map(c=>ranks.indexOf(c[0])).sort((x,y)=>x-y);
+ let suits=b.map(c=>c[1]);
+ let d=1;
+ // flush texture
+ let sc={};suits.forEach(s=>sc[s]=(sc[s]||0)+1);
+ let maxSuit=Math.max(...Object.values(sc));
+ if(maxSuit>=3)d-=0.45; else if(maxSuit===2)d-=0.18;
+ // connectedness
+ let span=vals[vals.length-1]-vals[0];
+ if(span<=2)d-=0.3; else if(span<=4)d-=0.18;
+ // paired boards are dry-ish (fewer draws) but can be scary; mild effect
+ let rc={};b.forEach(c=>rc[c[0]]=(rc[c[0]]||0)+1);
+ if(Math.max(...Object.values(rc))>=2)d+=0.12;
+ // big-card boards favour the preflop aggressor, making steals more credible
+ if(vals[vals.length-1]>=10)d+=0.1;
+ return Math.max(0,Math.min(1,d));
+}
+// Is this seat the last player still to act on this street?
+function isLastToAct(seat){
+ try{
+   let live=aliveIds().filter(i=>!G.p[i].allin);
+   if(live.length<2)return true;
+   let order=actors();
+   if(!order||!order.length)return false;
+   return order[order.length-1]===seat;
+ }catch(e){return false}
+}
+function bbSeatIndex(){try{return currentBlindSeats().bb}catch(e){return -1}}
+function botDecide(seat){
+ trackAggression();
+ let q=G.p[seat],c=callAmt(seat),strength=botHandStrength(seat),r=Math.random();
+ let potOdds=c>0?c/(G.pot+c):0,bbDepth=q.stack/G.bb;
+ let isPreflop=G.street==='PREFLOP';
+ let isAggressor=handAggressor===seat;
+
+ // True opening decision: preflop, nobody has voluntarily raised yet (maxBet is still just
+ // the forced blind). This must be checked by street/pot state, not by callAmt - most players
+ // technically "owe" the blind amount here even though no one has actually raised.
+ if(isPreflop&&G.maxBet<=G.bb){
+   let thresh=positionOpenThreshold(seat);
+   if(strength>thresh){
+     // Only jam as an opening action when genuinely short. At 20BB a real player
+     // opens 2-2.5x, they don't shove - shoving at that depth ends almost every
+     // hand preflop and the student never gets to play a postflop street.
+     let short=bbDepth<12;
+     let openMult=2.2+(strength>0.8?0.3:0);   // 2.2x standard, 2.5x with a premium
+     let t=short?q.bet+q.stack:Math.min(q.bet+q.stack,Math.max(minRaiseTo(),Math.round(G.bb*openMult)));
+     return canRaise(seat)&&t>G.maxBet?{type:'raise',amount:t}:{type:'call'};
+   }
+   if(c<=0)return{type:'call'};          // big blind, nothing to call - just check
+   // We didn't want to open this hand. Real players muck most of these rather
+   // than limping in: the old rule (strength>0.15 OR cheap price) called with
+   // literally everything, producing VPIP 100% / PFR 0% - every bot playing
+   // every hand and never raising.
+   let isBBseat=(seat===bbSeatIndex());
+   if(isBBseat&&strength>0.18)return{type:'call'};   // BB gets a discount
+   if(strength>0.38)return{type:'call'};             // decent speculative hand
+   if(strength>0.26&&potOdds<0.25)return{type:'call'}; // cheap and playable
+   return{type:'fold'};
+ }
+
+ if(c<=0){
+   // --- Postflop, nobody has bet: this is where real players attack ---
+   let dry=boardDryness();          // 1 = bone dry, 0 = very wet/coordinated
+   let last=isLastToAct(seat);      // acting last = much better steal spot
+   // Count opponents still IN THIS HAND (not merely players who still have chips -
+   // that was counting folded players and wildly over-penalising every bet).
+   let live=liveIds().length;
+   let multiway=Math.max(0,live-2);
+
+   // Base frequency: continuation-bet as the aggressor, value-bet real hands,
+   // and - crucially - steal when checked to on a board that likely missed
+   // everyone. This is the behaviour that was missing entirely.
+   let f;
+   if(strength>0.72)      f=0.85;                       // strong: bet for value
+   else if(isAggressor)   f=0.62+dry*0.22;              // c-bet, more on dry boards
+   else if(strength>0.5)  f=0.5;                        // decent: bet thin
+   else                   f=0.18+dry*0.40+(last?0.18:0);// pure steal attempt
+
+   // Later streets and more opponents both reduce how often a bluff works
+   let streetFactor={FLOP:1,TURN:0.82,RIVER:0.66}[G.street]||1;
+   if(strength<0.5)f*=streetFactor;
+   // Extra opponents make a BLUFF less likely to work - but a strong hand should
+   // be bet MORE multiway, not less. Applying this penalty to every hand meant a
+   // full house in a 6-way pot bet only 23% of the time and checked the rest.
+   if(strength<0.6)f*=Math.pow(0.78,multiway);
+   else f=Math.min(0.95,f+0.04*multiway);
+   if(last)f+=0.06;
+
+   if(r<f){
+     // Size by board type: small stabs on dry boards, bigger on wet ones where
+     // opponents have more draws to charge.
+     let pot=G.pot||G.bb;
+     let sizePct=strength>0.72?(0.62+ (1-dry)*0.25) : (0.36+(1-dry)*0.26);
+     let rawTarget=Math.round(pot*sizePct);
+     let ownStack=q.bet+q.stack;
+     // Shove when the bet would commit most of the stack anyway, or when very
+     // strong and short - real players jam rather than leave a useless stub.
+     if(strength>0.7&&rawTarget>ownStack*0.62)return{type:'jam'};
+     if(bbDepth<14&&strength>0.6)return{type:'jam'};
+     let capped=strength>0.8?rawTarget:Math.min(rawTarget,Math.round(ownStack*0.65));
+     let t=Math.min(ownStack,Math.max(minRaiseTo(),capped));
+     if(canRaise(seat)&&t>G.maxBet)return{type:'raise',amount:t};
+   }
+   return{type:'call'};
+ }
+
+ if(isPreflop){
+   // facing a genuine voluntary raise: fullSeq tells us how many full raises have happened
+   // this street (1 = facing an open, 2 = facing a 3-bet, 3+ = facing a 4-bet+)
+   let raiseDepth=G.fullSeq;
+   // 3-bet meaningfully often when facing a single open, including some light
+   // 3-bets as a bluff - a bot that only ever 3-bets aces is trivially readable
+   // and teaches the student nothing about handling aggression.
+   let jamThresh = raiseDepth>=2?0.88:0.86;
+   let threeBetThresh = raiseDepth===1?0.66:0.90;
+   // Defending against a single 2.2x open should be fairly wide - roughly the top
+   // third of hands, and wider still in the big blind, which closes the action at
+   // a discount. The previous threshold demanded ~top 15%, so every bot folded to
+   // every open and no hand ever developed past preflop.
+   let isBB=(seat===bbSeatIndex());
+   let callThresh=(raiseDepth<=1?0.38:0.55+raiseDepth*0.06)-(isBB?0.09:0);
+   if(bbDepth<12){ // genuine push/fold territory
+     if(strength>0.55-raiseDepth*0.05)return{type:'jam'};
+     return{type:'fold'};
+   }
+   if(strength>=jamThresh&&r<0.45)return{type:'jam'};
+   // 4-bet/jam over a 3-bet with a genuinely premium holding
+   if(raiseDepth>=2&&strength>=0.84&&r<0.55)return{type:'jam'};
+   if(strength>=threeBetThresh&&canRaise(seat)&&r<0.7){
+     let t=Math.min(q.bet+q.stack,G.maxBet+Math.max(G.lastFullRaise,Math.round(G.maxBet*1.15)));
+     if(t>G.maxBet)return{type:'raise',amount:t};
+   }
+   // Occasional light 3-bet as a bluff with a hand that plays acceptably
+   if(raiseDepth===1&&strength>=0.40&&strength<threeBetThresh&&canRaise(seat)&&r<0.13&&bbDepth>18){
+     let t=Math.min(q.bet+q.stack,G.maxBet+Math.max(G.lastFullRaise,Math.round(G.maxBet*1.05)));
+     if(t>G.maxBet)return{type:'raise',amount:t};
+   }
+   if(strength>=callThresh)return{type:'call'};
+   if(potOdds<0.38&&strength>0.28)return{type:'call'};   // price is right, take it
+   return{type:'fold'};
+ }
+ // --- postflop facing a bet ---
+ let dry2=boardDryness();
+ // Shove with a strong hand when short, or when a raise would commit us anyway
+ if(bbDepth<12&&strength>0.55&&potOdds<0.4)return{type:'jam'};
+ if(strength>0.86&&bbDepth<28&&r<0.5)return{type:'jam'};
+
+ // Raise for value with a big hand
+ if(strength>0.76&&r<0.45&&canRaise(seat)){
+   let t=Math.min(q.bet+q.stack,G.maxBet+Math.max(G.lastFullRaise,Math.round((G.pot+c)*0.75)));
+   if(t>G.maxBet)return{type:'raise',amount:t};
+ }
+ // Bluff-raise occasionally on dry boards where the bettor likely has nothing
+ // either - without this the bots never apply pressure back at the student.
+ if(strength<0.45&&dry2>0.6&&r<0.10&&canRaise(seat)&&bbDepth>16){
+   let t=Math.min(q.bet+q.stack,G.maxBet+Math.max(G.lastFullRaise,Math.round((G.pot+c)*0.7)));
+   if(t>G.maxBet)return{type:'raise',amount:t};
+ }
+
+ // Continuing needs a real hand, priced off the pot odds we're being laid
+ // Calibrated against the corrected strength scale: at typical pot odds this
+ // lands near 0.45-0.50, so an overpair or top pair continues while bottom pair
+ // and air fold. The old 0.42+potOdds*0.9 demanded ~0.74 - a straight - to call.
+ let contThresh=0.30+potOdds*0.55;
+ if(strength<contThresh&&r<0.9)return{type:'fold'};
+ return{type:'call'};
+}
+function maybeBotAct(){
+ if(!G||G.ended||G.paused||!G.botSeats||!G.botSeats.length)return;
+ if(G.current==null||G.street==='SHOWDOWN')return;
+ if(!G.botSeats.includes(G.current))return;
+ let key=G.current+'_'+G.hand+'_'+G.street+'_'+G.log.length;
+ if(botScheduledFor===key)return;
+ botScheduledFor=key;
+ clearTimeout(botTimer);
+ let seat=G.current,handAtSchedule=G.hand,streetAtSchedule=G.street;
+ botTimer=setTimeout(()=>{
+   if(!G||G.ended||G.paused)return;
+   if(G.current!==seat||G.hand!==handAtSchedule||G.street!==streetAtSchedule)return;
+   let d=botDecide(seat);revealSeat=seat;act(d.type,d.amount);
+ },650+Math.random()*750);
+}
+let lastPresetClicked=null;
+function preset(k){let i=G.current,q=G.p[i],c=callAmt(i),t=minRaiseTo();if(G.street==='PREFLOP'){if(k!=='min')t=Math.max(t,Math.round(parseFloat(k)*Math.max(G.bb,G.maxBet)))}else{let pct=k==='pot'?1:parseFloat(k)/100;if(k!=='min')t=G.maxBet===0?Math.max(t,Math.round(G.pot*pct)):Math.max(t,Math.round(G.maxBet+(G.pot+c)*pct))}let v=Math.min(q.bet+q.stack,t);let dv=liveShowBB?(v/G.bb).toFixed(1):v;$('raiseTo').value=dv;$('raiseRange')&&($('raiseRange').value=dv);raiseCurrentVal=v;lastPresetClicked=k;
+ let btn=event&&event.target;if(btn){document.querySelectorAll('.quick button').forEach(b=>b.classList.remove('active'));btn.classList.add('active')}
+ let box=document.getElementById('raiseTo');if(box){box.classList.remove('flash-update');void box.offsetWidth;box.classList.add('flash-update')}
+}
+
+/* ---- tournament clock (blind escalation) ---- */
+function niceRound(x){if(x<100)return Math.round(x/5)*5;if(x<1000)return Math.round(x/25)*25;return Math.round(x/50)*50}
+// Real-world standard blind ladder, expressed as BB multiples of the starting BB.
+// This mirrors the round-number progression used by GGPoker and live tournament
+// structures (100/200 -> 150/300 -> 200/400 -> 300/600 ...) rather than a flat
+// mathematical multiplier, which produces awkward numbers like 1,372/2,744.
+const BLIND_LADDER=[1,1.5,2,3,4,5,6,8,10,12,15,20,25,30,40,50,60,80,100,125,150,200,250,300,400,500,600,800,1000,1250];
+function buildLevels(sb,bb,bba,count){
+ count=count||BLIND_LADDER.length;
+ let hasAnte=bba>0,levels=[],ratio=sb/bb;
+ for(let i=0;i<count;i++){
+   let mult=BLIND_LADDER[Math.min(i,BLIND_LADDER.length-1)];
+   // past the end of the ladder, keep climbing at a steady ~1.25x
+   if(i>=BLIND_LADDER.length)mult=BLIND_LADDER[BLIND_LADDER.length-1]*Math.pow(1.25,i-BLIND_LADDER.length+1);
+   let b=bb*mult,s=b*ratio;
+   let bRounded=niceRound(b);
+   levels.push({sb:niceRound(s),bb:bRounded,bba:hasAnte?bRounded:0});
+ }
+ return levels;
+}
+function fmtClock(s){s=Math.max(0,s|0);let m=Math.floor(s/60),ss=s%60;return String(m).padStart(2,'0')+':'+String(ss).padStart(2,'0')}
+function levelTick(){
+ if(!G||G.paused||G.ended||!G.levels||!G.levelMinutes)return;
+ G.levelSeconds--;
+ if(G.levelSeconds<=0){
+   if(G.levelIdx<G.levels.length-1){
+     G.levelIdx++;let lv=G.levels[G.levelIdx];G.sb=lv.sb;G.bb=lv.bb;G.bba=lv.bba;G.levelSeconds=G.levelMinutes*60;
+     G.log.push(`עלייה לרמה ${G.levelIdx+1}: בליינדים ${fmt(G.sb)}/${fmt(G.bb)}`);
+   }else{G.levelSeconds=0}
+ }
+ render();
+}
+function toast(msg){let t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),1800)}
+function onRaiseInput(source){
+ let v=+source.value;
+ raiseCurrentVal=liveShowBB?Math.round(v*G.bb):Math.round(v);
+ let other=source.id==='raiseTo'?$('raiseRange'):$('raiseTo');
+ if(other)other.value=liveShowBB?(raiseCurrentVal/G.bb).toFixed(1):raiseCurrentVal;
+ lastPresetClicked=null;
+}
+function wheelAdjustRaise(ev){
+ ev.preventDefault();
+ let el=$('raiseTo');if(!el||el.disabled)return;
+ let chipStep=(G&&G.bb)||100;
+ let cur=raiseCurrentVal!=null?raiseCurrentVal:+el.value*(liveShowBB?G.bb:1);
+ let next=ev.deltaY<0?cur+chipStep:cur-chipStep;
+ let min=liveShowBB?(+el.min*G.bb):+el.min||0, max=liveShowBB?(+el.max*G.bb):(+el.max||next);
+ next=Math.max(min,Math.min(max,Math.round(next)));
+ raiseCurrentVal=next;
+ el.value=liveShowBB?(next/G.bb).toFixed(1):next;
+ let r=$('raiseRange');if(r)r.value=el.value;
+}
+function ensureAudio(){if(!actx)actx=new (window.AudioContext||window.webkitAudioContext)();if(actx.state==='suspended')actx.resume()}
+function beep(){try{if(!soundOn)return;ensureAudio();let o=actx.createOscillator(),g=actx.createGain();o.type='sine';o.frequency.value=660;g.gain.value=.0001;o.connect(g);g.connect(actx.destination);let t=actx.currentTime;g.gain.exponentialRampToValueAtTime(.05,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+.18);o.start(t);o.stop(t+.2)}catch(e){}}
+
+/* ---- chips + cards ---- */
+function chipIcon(amt){return amt?'<span class="chip"></span>':''}
+function card(c,show){if(!show)return'<div class="card back"></div>';let r=c[0],s=c[1];return`<div class="card suit-${s}"><span class="rank">${r}</span><span class="suiticon">${SU[s]}</span></div>`}
+function ringMarkup(left,total){let pct=Math.max(0,Math.min(1,left/total)),r=27,c=2*Math.PI*r,off=c*(1-pct);return`<div class="ring"><svg viewBox="0 0 64 64"><circle class="ring-bg" cx="32" cy="32" r="${r}"></circle><circle class="ring-fg" cx="32" cy="32" r="${r}" style="stroke-dasharray:${c};stroke-dashoffset:${off}"></circle></svg><span class="ring-num">${left}</span></div>`}
+function potTotalDisplay(){if(G.street==='SHOWDOWN')return G.p.reduce((a,q)=>a+(q.total||0),0);return G.pot}
+function potBreakdown(){if(!G||G.street!=='SHOWDOWN')return'';let levels=[...new Set(G.p.map(q=>q.total).filter(x=>x>0))].sort((a,b)=>a-b);if(levels.length<=1)return'';let prev=0,parts=[];levels.forEach((lev,idx)=>{let contributors=G.p.filter(q=>q.total>=lev).length,amt=(lev-prev)*contributors;parts.push(`${idx===0?'קופה ראשית':'קופת side #'+idx} ${fmt(amt)}`);prev=lev});return parts.join(' · ')}
+
+/* ---- history review ---- */
+function openHistory(){renderHistoryList();$('historyModal').classList.add('open')}
+function renderHistoryList(){
+ let rows=history.length?[...history].reverse().map(h=>{let winners=h.p.map((p,i)=>h.pay[i]?p.name:null).filter(Boolean).join(', ')||'—';return`<div class="histrow"><div><b>יד #${h.hand}</b><span class="muted"> · פוט ${fmt(h.pay.reduce((a,x)=>a+x,0))}</span><div class="muted" style="font-size:12px">זוכה: ${winners}</div></div><button class="btn ghost" onclick="showHand(${h.hand})">צפייה</button></div>`}).join(''):'<p class="muted" style="font-size:12.5px">אין עדיין ידיים שהושלמו בסשן הנוכחי.</p>';
+ $('historyBox').innerHTML=`<h2>סקירת ידיים</h2>${rows}
+  <button class="btn ghost wide" style="margin-top:12px" onclick="closeModal('historyModal')">סגור</button>`;
+}
+function exportSessionHistory(){
+ if(!history.length){toast('אין ידיים בסשן הנוכחי לייצוא');return}
+ let blob=new Blob([JSON.stringify(history,null,2)],{type:'application/json'});
+ let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='outplay-session-'+Date.now()+'.json';a.click();URL.revokeObjectURL(a.href);
+}
+/* ===== Hand history import (PokerStars / GGPoker text format) =====
+   Parses the standard text export that most sites produce, converting each hand
+   into the same internal shape the app uses for its own hands, so imported
+   tournament hands can be browsed and replayed exactly like played ones. */
+function normalizeCard(c){
+ if(!c)return null;
+ c=c.trim();
+ let m=c.match(/^([2-9TJQKA]|10)([shdc])$/i);
+ if(!m)return null;
+ let r=m[1].toUpperCase();if(r==='10')r='T';
+ return r+m[2].toLowerCase();
+}
+function parseHandHistoryText(text){
+ // Hands are separated by blank lines before a new "Hand #" header.
+ let blocks=text.split(/\n\s*\n(?=[^\n]*Hand\s*#)/).map(b=>b.trim()).filter(Boolean);
+ if(blocks.length===1&&!/Hand\s*#/.test(blocks[0]))return [];
+ let out=[];
+ blocks.forEach((block,bi)=>{
+  try{
+   let lines=block.split('\n').map(l=>l.trim()).filter(Boolean);
+   let header=lines.find(l=>/Hand\s*#/.test(l))||'';
+   let handNo=(header.match(/Hand\s*#\s*([A-Za-z0-9]+)/)||[])[1]||String(bi+1);
+   let numericHand=parseInt(String(handNo).replace(/\D/g,'').slice(-6),10);
+   if(isNaN(numericHand))numericHand=bi+1;
+   // blinds from the header level, e.g. "(100/200)" or "(100/200/25)"
+   let lvl=header.match(/\((\d[\d,]*)\s*\/\s*(\d[\d,]*)(?:\s*\/\s*(\d[\d,]*))?\)/);
+   let sb=lvl?+lvl[1].replace(/,/g,''):0;
+   let bb=lvl?+lvl[2].replace(/,/g,''):0;
+   let bba=lvl&&lvl[3]?+lvl[3].replace(/,/g,''):0;
+
+   // seats
+   let seatRe=/^Seat\s+(\d+):\s+(.+?)\s+\(\$?([\d,\.]+)\s+in chips/;
+   let seats=[];
+   lines.forEach(l=>{let m=l.match(seatRe);if(m)seats.push({seatNo:+m[1],name:m[2].trim(),stack:Math.round(parseFloat(m[3].replace(/,/g,'')))})});
+   if(!seats.length)return;
+   let seatIdx={};seats.forEach((s,i)=>{seatIdx[s.name]=i});
+
+   // button
+   let btnLine=lines.find(l=>/Seat\s*#\s*\d+\s+is the button/.test(l))||'';
+   let btnSeatNo=+(btnLine.match(/Seat\s*#\s*(\d+)\s+is the button/)||[])[1];
+   let button=seats.findIndex(s=>s.seatNo===btnSeatNo);
+   if(button<0)button=0;
+
+   // blinds fallback from the posting lines if header had no level
+   if(!bb){
+    let bbPost=lines.find(l=>/posts big blind/i.test(l));
+    if(bbPost){let m=bbPost.match(/posts big blind\s+\$?([\d,\.]+)/i);if(m)bb=Math.round(parseFloat(m[1].replace(/,/g,'')))}
+    let sbPost=lines.find(l=>/posts small blind/i.test(l));
+    if(sbPost){let m=sbPost.match(/posts small blind\s+\$?([\d,\.]+)/i);if(m)sb=Math.round(parseFloat(m[1].replace(/,/g,'')))}
+   }
+
+   // hole cards
+   let holes={};
+   lines.forEach(l=>{
+    let m=l.match(/^Dealt to\s+(.+?)\s+\[([^\]]+)\]/);
+    if(m){let cards=m[2].split(/\s+/).map(normalizeCard).filter(Boolean);if(cards.length)holes[m[1].trim()]=cards}
+    let sm=l.match(/^(.+?):\s+shows\s+\[([^\]]+)\]/);
+    if(sm){let cards=sm[2].split(/\s+/).map(normalizeCard).filter(Boolean);if(cards.length===2)holes[sm[1].trim()]=cards}
+   });
+
+   // board + action log
+   let board=[],log=[`Hand #${numericHand}`];
+   let inSummary=false;
+   lines.forEach(l=>{
+    if(/^\*\*\*\s*SUMMARY/i.test(l)){inSummary=true;return}
+    if(inSummary)return;
+    let fm=l.match(/^\*\*\*\s*FLOP\s*\*\*\*\s*\[([^\]]+)\]/i);
+    if(fm){log.push('FLOP');fm[1].split(/\s+/).map(normalizeCard).filter(Boolean).forEach(c=>board.push(c));return}
+    let tm=l.match(/^\*\*\*\s*TURN\s*\*\*\*.*\[([^\]]+)\]\s*$/i);
+    if(tm){log.push('TURN');let c=normalizeCard(tm[1].split(/\s+/).pop());if(c)board.push(c);return}
+    let rm=l.match(/^\*\*\*\s*RIVER\s*\*\*\*.*\[([^\]]+)\]\s*$/i);
+    if(rm){log.push('RIVER');let c=normalizeCard(rm[1].split(/\s+/).pop());if(c)board.push(c);return}
+    if(/^\*\*\*/.test(l))return;
+    if(/^(Table|Seat\s+\d+:|Dealt to)/i.test(l))return;
+    if(/Hand\s*#/.test(l))return;
+    // action lines
+    let am=l.match(/^(.+?):\s+(folds|checks|calls|bets|raises)\b(.*)$/i);
+    if(am){
+     let who=am[1].trim(),verb=am[2].toLowerCase(),rest=am[3]||'';
+     let allin=/all-in/i.test(rest);
+     if(verb==='folds')log.push(`${who} folds`);
+     else if(verb==='checks')log.push(`${who} checks`);
+     else if(verb==='calls'){let m=rest.match(/\$?([\d,\.]+)/);log.push(`${who} calls ${m?fmt(parseFloat(m[1].replace(/,/g,''))):''}${allin?' all-in':''}`.trim())}
+     else if(verb==='bets'){let m=rest.match(/\$?([\d,\.]+)/);log.push(`${who} bets ${m?fmt(parseFloat(m[1].replace(/,/g,''))):''}${allin?' all-in':''}`.trim())}
+     else if(verb==='raises'){let m=rest.match(/to\s+\$?([\d,\.]+)/i);log.push(`${who} raises to ${m?fmt(parseFloat(m[1].replace(/,/g,''))):''}${allin?' all-in':''}`.trim())}
+     return;
+    }
+   });
+
+   // payouts from the summary section
+   let pay=new Array(seats.length).fill(0);
+   lines.forEach(l=>{
+    let m=l.match(/^(.+?)\s+collected\s+\$?([\d,\.]+)/i)||l.match(/^Seat\s+\d+:\s+(.+?)\s+.*won\s+\(\$?([\d,\.]+)\)/i);
+    if(m){
+     let who=m[1].trim().replace(/\s*\(.*$/,'');
+     let amt=Math.round(parseFloat(m[2].replace(/,/g,'')));
+     let idx=seatIdx[who];
+     if(idx!==undefined)pay[idx]+=amt;
+    }
+   });
+   let potTotal=pay.reduce((a,b)=>a+b,0);
+   if(potTotal>0){
+    let winners=pay.map((v,i)=>v>0?seats[i].name:null).filter(Boolean).join(', ');
+    if(winners)log.push(pay.map((v,i)=>v>0?`${seats[i].name} +${fmt(v)}`:null).filter(Boolean).join(' · '));
+   }
+
+   out.push({
+    hand:numericHand,
+    board,
+    p:seats.map(s=>({name:s.name,stack:s.stack,hole:holes[s.name]||[],total:0})),
+    log,pay,button,n:seats.length,
+    sb:sb||0,bb:bb||0,bba:bba||0,
+    imported:true
+   });
+  }catch(e){/* skip unparseable hand, keep going */}
+ });
+ return out;
+}
+function importHandHistory(ev){
+ let file=ev.target.files[0];if(!file)return;
+ let reader=new FileReader();
+ reader.onload=()=>{
+  try{
+   let parsed=parseHandHistoryText(String(reader.result));
+   if(!parsed.length){toast('לא זוהו ידיים בקובץ — ודאו שזה קובץ hand history טקסט מ-GGPoker/PokerStars');return}
+   let added=0;
+   parsed.forEach(h=>{
+    if(!history.find(x=>x.hand===h.hand&&JSON.stringify(x.log)===JSON.stringify(h.log))){history.push(h);added++}
+   });
+   history.sort((a,b)=>a.hand-b.hand);
+   renderHistoryList();
+   if($('libHistCount'))$('libHistCount').textContent=history.length?`(${history.length})`:'';
+   toast(added?`יובאו ${added} ידיים מתוך ${parsed.length} שזוהו`:'כל הידיים כבר קיימות');
+  }catch(e){toast('שגיאה בקריאת הקובץ')}
+ };
+ reader.readAsText(file);ev.target.value='';
+}
+function importSessionHistory(ev){
+ let file=ev.target.files[0];if(!file)return;
+ let reader=new FileReader();
+ reader.onload=()=>{
+  try{
+   let arr=JSON.parse(reader.result);
+   if(!Array.isArray(arr))throw new Error('not an array');
+   let added=0;
+   arr.forEach(h=>{
+    if(h&&typeof h.hand==='number'&&Array.isArray(h.p)&&Array.isArray(h.board)&&Array.isArray(h.log)){
+     if(!history.find(x=>x.hand===h.hand&&JSON.stringify(x.log)===JSON.stringify(h.log)))history.push(h);
+     added++;
+    }
+   });
+   renderHistoryList();
+   if($('libHistCount'))$('libHistCount').textContent=history.length?`(${history.length})`:'';
+   toast(added?`יובאו ${added} ידיים`:'לא נמצאו ידיים תקינות בקובץ');
+  }catch(e){toast('קובץ לא תקין — צריך להיות ייצוא סשן של OUTPLAY')}
+ };
+ reader.readAsText(file);ev.target.value='';
+}
+function groupLogByStreet(log){
+ let sections={preflop:[],flop:[],turn:[],river:[]},cur='preflop';
+ log.forEach((line,idx)=>{
+   if(line==='FLOP'){cur='flop';return}
+   if(line==='TURN'){cur='turn';return}
+   if(line==='RIVER'){cur='river';return}
+   if(/^Hand #/.test(line))return;
+   if(/^תרגיל:/.test(line))return;
+   sections[cur].push({line,idx});
+ });
+ return sections;
+}
+function isPayoutLine(line){return /\+[\d,]+/.test(line)||/ wins /.test(line)}
+function potAtEndOfSection(h,items){
+ if(!items||!items.length)return null;
+ let trail=potTrailByHand[h.hand];
+ if(trail){
+   for(let i=items.length-1;i>=0;i--){
+     let v=trail[items[i].idx];
+     if(v!=null&&v>0)return v;
+   }
+ }
+ return h.pay?h.pay.reduce((a,b)=>a+b,0):null;
+}
+function fmtUnit(n,bb){if(n==null)return'—';return replayShowBB&&bb?(n/bb).toFixed(1)+' BB':fmt(n)}
+function convertLineToBB(line,bb){
+ if(!replayShowBB||!bb)return line;
+ return line.replace(/[\d,]+/g,m=>{let v=parseInt(m.replace(/,/g,''),10);return isNaN(v)?m:(v/bb).toFixed(1)+'bb'});
+}
+function toggleReplayUnit(handNo){replayShowBB=!replayShowBB;showHand(handNo)}
+function replaySeatBlinds(h){
+ let n=h.n||h.p.length;
+ if(h.button==null)return{sb:null,bb:null};
+ if(n===2)return{sb:h.button,bb:(h.button+1)%n};
+ return{sb:(h.button+1)%n,bb:(h.button+2)%n};
+}
+function boardCountAtStep(h,stepIdx){
+ if(stepIdx==null||stepIdx<0)return 0;
+ let street='preflop';
+ for(let i=0;i<=stepIdx&&i<h.log.length;i++){
+   if(h.log[i]==='FLOP')street='flop';
+   if(h.log[i]==='TURN')street='turn';
+   if(h.log[i]==='RIVER')street='river';
+ }
+ return{preflop:0,flop:3,turn:4,river:5}[street];
+}
+function potAtStepDirect(h,stepIdx){
+ let base=(h.sb||0)+(h.bb||0)+(h.bba||0);
+ if(stepIdx==null||stepIdx<0)return base;
+ let trail=potTrailByHand[h.hand];
+ if(trail){for(let i=stepIdx;i>=0;i--){if(trail[i]!=null&&trail[i]>0)return trail[i]}}
+ return base;
+}
+function seatStateAtStep(h,stepIdx){
+ let folded=new Set(),bets={},allinSet=new Set();
+ let upto=stepIdx==null?h.log.length-1:stepIdx;
+ for(let i=0;i<=upto&&i<h.log.length;i++){
+  let line=h.log[i];
+  if(line==='FLOP'||line==='TURN'||line==='RIVER'){bets={};continue}
+  let mFold=line.match(/^(.+?) folds/);
+  if(mFold){folded.add(mFold[1]);continue}
+  let isAllin=/all-in/i.test(line);
+  let mBet=line.match(/^(.+?) (?:calls|raises to|bets) ([\d,]+)/);
+  if(mBet){bets[mBet[1]]=parseInt(mBet[2].replace(/,/g,''));if(isAllin)allinSet.add(mBet[1]);continue}
+  let mCheck=line.match(/^(.+?) checks/);
+  if(mCheck){bets[mCheck[1]]=0;continue}
+ }
+ return{folded,bets,allinSet};
+}
+function renderReplayTable(h,stepIdx){
+ let n=h.n||h.p.length,pos=POS[n]||POS[6],{sb,bb}=replaySeatBlinds(h);
+ let showFinal=stepIdx===undefined;
+ let boardCount=showFinal?h.board.length:boardCountAtStep(h,stepIdx);
+ let potNow=showFinal?(h.pay?h.pay.reduce((a,b)=>a+b,0):0):potAtStepDirect(h,stepIdx);
+ let atEnd=showFinal||(stepIdx>=(h.log.length-1));
+ let seatState=seatStateAtStep(h,showFinal?null:stepIdx);
+ let seats=h.p.map((p,i)=>{
+   let won=atEnd&&h.pay&&h.pay[i]>0,tags='';
+   if(h.button===i)tags+='<span class="tag dealer">D</span>';
+   if(sb===i)tags+='<span class="tag blind">SB</span>';
+   if(bb===i)tags+='<span class="tag blind">BB</span>';
+   let cardsHtml=(p.hole&&p.hole.length)?p.hole.map(c=>card(c,true)).join(''):'<div class="card back"></div><div class="card back"></div>';
+   let ps=pos[i]?`left:${pos[i][0]}%;top:${pos[i][1]}%`:'';
+   let isFolded=seatState.folded.has(p.name);
+   let isAllin=seatState.allinSet.has(p.name);
+   let betAmt=seatState.bets[p.name];
+   let betHtml=betAmt?`<div class="bet"><span class="betline ${isAllin?'allin-bet':''}">${chipIcon(betAmt)}${fmtUnit(betAmt,h.bb)}${isAllin?' ALL-IN':''}</span></div>`:'';
+   let foldTag=isFolded?'<div class="fold-stamp">FOLD</div>':'';
+   return`<div class="seat replay-seat ${won?'winner':''}" style="${ps};opacity:${isFolded?.4:1}"><div class="cards">${cardsHtml}</div><div class="avatar" style="background:${AVATAR_COLORS[i%AVATAR_COLORS.length]}">${(p.name||'?').charAt(0).toUpperCase()}</div><div class="nameplate"><div class="name">${p.name}${tags}</div>${won?`<div class="win-amt">+${fmtUnit(h.pay[i],h.bb)}</div>`:''}</div>${betHtml}${foldTag}</div>`;
+ }).join('');
+ return`<div class="replay-tablewrap"><div class="replay-rail"><div class="replay-table"><div class="board">${h.board.slice(0,boardCount).map(c=>card(c,true)).join('')}</div><div class="replay-pot">${chipIcon(potNow)}${fmtUnit(potNow,h.bb)}</div>${seats}</div></div></div>`;
+}
+function renderStreetColumns(h,currentIdx){
+ let sec=groupLogByStreet(h.log);
+ let boardAt={preflop:[],flop:h.board.slice(0,3),turn:h.board.slice(0,4),river:h.board.slice(0,5)};
+ let labels={preflop:'Pre-Flop',flop:'Flop',turn:'Turn',river:'River'};
+ let order=['preflop','flop','turn','river'];
+ let cols=order.filter(k=>sec[k].length||boardAt[k].length);
+ if(!cols.length)return'<p class="muted" style="font-size:12.5px">אין נתוני פעולות עבור היד הזו.</p>';
+ return`<div class="street-grid">${cols.map(k=>{
+   let pot=potAtEndOfSection(h,sec[k]);
+   return`<div class="street-col"><div class="street-head"><div class="street-head-top"><span>${labels[k]}</span>${pot!=null?`<span class="street-pot">קופה: ${fmtUnit(pot,h.bb)}</span>`:''}</div>${boardAt[k].length?`<div class="street-board">${boardAt[k].map(c=>card(c,true)).join('')}</div>`:''}</div>${sec[k].map(x=>`<div class="street-line ${currentIdx!=null&&x.idx===currentIdx?'now-playing':''}" id="${currentIdx!=null&&x.idx===currentIdx?'replayNowPlaying':''}">${currentIdx!=null&&x.idx===currentIdx?'▶ ':''}${convertLineToBB(x.line,h.bb)}</div>`).join('')||'<div class="street-line muted">—</div>'}</div>`;
+ }).join('')}</div>`;
+}
+let replayEverStepped=false;
+let replayStepIdx=-1, replayPlaying=false, replayPlayTimer=null;
+function stepNav(handNo,dir){
+ let h=history.find(x=>x.hand===handNo);if(!h)return false;
+ replayEverStepped=true;
+ let realIdx=h.log.map((l,i)=>({l,i})).filter(x=>!/^Hand #/.test(x.l)&&!/^תרגיל:/.test(x.l)).map(x=>x.i);
+ let pos=realIdx.indexOf(replayStepIdx);
+ let newPos=Math.max(-1,Math.min(realIdx.length-1,pos+dir));
+ let moved=newPos!==pos;
+ replayStepIdx=newPos<0?-1:realIdx[newPos];
+ showHand(handNo);
+ return moved;
+}
+function togglePlay(handNo){
+ replayEverStepped=true;
+ replayPlaying=!replayPlaying;
+ clearInterval(replayPlayTimer);
+ if(replayPlaying){
+  replayStepIdx=-1;
+  replayPlayTimer=setInterval(()=>{
+    let moved=stepNav(handNo,1);
+    if(!moved){replayPlaying=false;clearInterval(replayPlayTimer);showHand(handNo)}
+  },900);
+ }
+ showHand(handNo);
+}
+let replayHandShown=null;
+function showHand(handNo){
+ let h=history.find(x=>x.hand===handNo);if(!h)return;
+ if(replayHandShown!==handNo){replayHandShown=handNo;replayStepIdx=-1;replayPlaying=false;replayEverStepped=false;clearInterval(replayPlayTimer)}
+ let totalSteps=h.log.filter(l=>!/^Hand #/.test(l)&&!/^תרגיל:/.test(l)).length;
+ let curStep=!replayEverStepped?totalSteps:(replayStepIdx<0?0:h.log.filter((l,i)=>i<=replayStepIdx&&!/^Hand #/.test(l)&&!/^תרגיל:/.test(l)).length);
+ let stepControls=`<div style="display:flex;gap:8px;align-items:center;justify-content:center;margin:10px 0">
+   <button class="btn ghost" style="padding:7px 12px" onclick="clearInterval(replayPlayTimer);replayPlaying=false;stepNav(${h.hand},-1)">◂</button>
+   <button class="btn gold" style="padding:7px 18px;min-width:80px" onclick="togglePlay(${h.hand})">${replayPlaying?'⏸ עצור':'▶ הפעל'}</button>
+   <button class="btn ghost" style="padding:7px 12px" onclick="clearInterval(replayPlayTimer);replayPlaying=false;stepNav(${h.hand},1)">▸</button>
+   <span class="muted" style="font-size:11.5px">${curStep} / ${totalSteps}</span>
+ </div>
+ <div class="replay-progress"><div class="replay-progress-fill" style="width:${totalSteps?Math.round(100*curStep/totalSteps):0}%"></div></div>`;
+ let activeIdx=replayEverStepped?replayStepIdx:null;
+ $('historyBox').innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px"><h2 style="margin:0">יד #${h.hand}</h2><button class="btn ghost" style="font-size:11px;padding:6px 12px" onclick="toggleReplayUnit(${h.hand})">${replayShowBB?'✓ מציג ב-BB':'הצג ב-BB'}</button></div>
+   <div class="libnote" style="margin:6px 0 2px">לחצו ▶ כדי לצפות ביד מתקדמת שלב-שלב על גבי השולחן. הרישום המלא למטה תמיד גלוי — השורה המסומנת מראה איפה נמצאים.</div>
+   ${renderReplayTable(h,replayEverStepped?replayStepIdx:undefined)}
+   ${stepControls}
+   <div class="dl-title" style="margin-top:16px">מהלך היד לפי רחוב (רישום מלא)</div>
+   ${renderStreetColumns(h,activeIdx)}
+   <div style="display:flex;gap:8px;margin-top:16px"><button class="btn ghost" onclick="clearInterval(replayPlayTimer);replayPlaying=false;renderHistoryList()">חזרה לרשימה</button><button class="btn ghost" onclick="clearInterval(replayPlayTimer);replayPlaying=false;closeModal('historyModal')">סגור</button></div>`;
+ let nowPlayingEl=$('replayNowPlaying');
+ if(nowPlayingEl)nowPlayingEl.scrollIntoView({block:'nearest',behavior:'smooth'});
+}
+function closeModal(id){clearInterval(replayPlayTimer);replayPlaying=false;$(id).classList.remove('open')}
+
+/* ---- render ---- */
+const AVATAR_COLORS=['#3d8fd9','#d9483d','#3fa868','#a259d9','#e0954f','#3fb0c9','#d9508f','#8ab63f'];
+// How long the finished hand stays on screen before the next one is dealt.
+// Coach-adjustable from the lobby; the old 900ms was far too fast to read the
+// board or see the opponent's cards.
+let HAND_REVIEW_MS=4000;
+function render(){
+ try{
+   _renderImpl();
+   let ab0=document.getElementById('actionbar');
+   if(ab0&&ab0.dataset.errShown)delete ab0.dataset.errShown;
+ }
+ catch(e){
+   console.error('render() failed:',e&&e.message,e&&e.stack);
+   let ab=document.getElementById('actionbar');
+   if(ab&&!ab.dataset.errShown){ab.dataset.errShown='1';toast('קרתה תקלה בעדכון המסך — נסו ללחוץ שוב או לרענן')}
+ }
+}
+window.addEventListener('error',function(ev){
+ console.error('Global error:',ev.message,'at',ev.filename+':'+ev.lineno+':'+ev.colno,ev.error&&ev.error.stack);
+});
+function _renderImpl(){if(!G)return;let m=MODES[G.mode]||[G.spotTitle||'תרגיל',0,0,0],{sb,bb}=currentBlindSeats(),alive=aliveIds().length,avg=alive?Math.round(G.p.reduce((a,q)=>a+q.stack,0)/alive):0;
+ while(handPotTrail.length<G.log.length)handPotTrail.push(G.pot);
+ if(G.hand)potTrailByHand[G.hand]=handPotTrail.slice();
+ $('sideRail').innerHTML=`
+  <button title="השהה / המשך" onclick="togglePause()"><span class="rail-icon">${G.paused?'▶':'⏸'}</span><span class="rail-label">${G.paused?'המשך':'השהה'}</span></button>
+  <button title="סקירת ידיים" onclick="openHistory()"><span class="rail-icon">📜${history.length?`<span class="badge">${history.length}</span>`:''}</span><span class="rail-label">ידיים</span></button>
+  <button title="חזרה לתפריט" onclick="confirmBackToLobby()"><span class="rail-icon">🚪</span><span class="rail-label">יציאה</span></button>`;
+ updateStatsFromHistory();
+ if(G.bountyOn&&G.bustedTracked){
+   G.p.forEach((q,i)=>{
+     if(q.stack<=0&&!G.bustedTracked[i]){
+       G.bustedTracked[i]=true;
+       let lastHand=history[history.length-1];
+       if(lastHand&&lastHand.pay){
+         let maxPay=-1,winner=-1;
+         lastHand.pay.forEach((amt,j)=>{if(j!==i&&amt>maxPay){maxPay=amt;winner=j}});
+         if(winner>=0&&maxPay>0){
+           let totalBounty=G.bounty[i]||0;
+           let cashHalf=Math.ceil(totalBounty/2);
+           let addToBounty=totalBounty-cashHalf;
+           G.bountiesWon[winner]=(G.bountiesWon[winner]||0)+cashHalf;
+           G.bounty[winner]=(G.bounty[winner]||0)+addToBounty;
+           G.bounty[i]=0;
+           toast(`🎯 ${G.p[winner].name} זכה ב-$${cashHalf} מזומן על חיסול ${q.name} · $${addToBounty} התווסף לבאונטי שלו (כעת $${G.bounty[winner]})`);
+         }
+       }
+     }
+   });
+ }
+ applyMobileAspect(G.n);
+ let seats=G.p.map((q,i)=>{let pos=posFor(G.n)[i],show=G.street==='SHOWDOWN'||(remoteMode?i===mySeat:i===revealSeat),turn=i===G.current;let justRevealed=show&&!wasShown[i];wasShown[i]=show;
+   let tags='';if(i===G.button)tags+='<span class="tag dealer">D</span>';if(i===sb)tags+='<span class="tag blind">SB</span>';if(i===bb)tags+='<span class="tag blind">BB</span>';
+   let bounty=G.bountyOn?`<span class="tag bounty" title="באונטי על הראש של ${q.name}">🎯$${G.bounty[i]||0}</span>${G.bountiesWon[i]?`<span class="tag bounty-won" title="באונטי שנאסף">+$${G.bountiesWon[i]}</span>`:''}`:'';
+   let bet=q.bet?`<span class="betline">${chipIcon(q.bet)}${fmtChip(q.bet)}</span>`:'';
+   let cardsHtml=q.hole.map(c=>{let html=card(c,show);if(justRevealed)html=html.replace('class="card','class="card flip-anim');return html}).join('');
+   let initial=(q.name||'?').trim().charAt(0).toUpperCase();
+   let stackDisplay=liveShowBB?`${(q.stack/G.bb).toFixed(1)} BB`:fmt(q.stack);
+   let st=playerStats[i]||{hands:0,vpip:0,pfr:0},vpipPct=st.hands?Math.round(100*st.vpip/st.hands):0,pfrPct=st.hands?Math.round(100*st.pfr/st.hands):0;
+   let hudLine=`<div class="hudstat ${st.hands<3?'dim':''}" title="VPIP/PFR מתוך ${st.hands} ידיים בסשן זה">${vpipPct}/${pfrPct} <span style="opacity:.7">(${st.hands})</span></div>`;
+   return`<div class="seat ${turn?'turn':''}" style="left:${pos[0]}%;top:${pos[1]}%;opacity:${q.fold?.45:q.stack<=0?.3:1}"><div class="cards">${cardsHtml}</div>${turn&&G.decision?`<div class="turnclock ${G.turnLeft<=5?'urgent':''}">${G.turnLeft}</div>`:''}<div class="avatar" style="background:${AVATAR_COLORS[i%AVATAR_COLORS.length]};border-color:${AVATAR_COLORS[i%AVATAR_COLORS.length]}66">${initial}<span class="seatnum">${i+1}</span></div><div class="nameplate" onclick="toggleLiveUnit()" title="לחיצה מחליפה תצוגת ערימה בין צ'יפים ל-BB" style="cursor:pointer"><div class="name">${q.name}${tags}${bounty}</div><div class="chips">${stackDisplay}</div>${hudLine}</div><div class="bet">${bet}</div></div>`
+ }).join('');
+ let pb=potBreakdown();
+ let isMobile=isCompactLayout();
+ let turnInfo=G.current!=null?`<div class="row"><span>תור</span><b class="accent">${G.p[G.current].name}${G.decision?` (${G.turnLeft}s)`:''}</b></div>`:'';
+ $('hudmini').innerHTML=`${turnInfo}${G.levels?`<div class="row"><span>Level</span><b class="accent">${G.levelIdx+1}${G.levelIdx>=G.levels.length-1?' (MAX)':''}</b></div><div class="row"><span>Clock</span><b>${fmtClock(G.levelSeconds)}</b></div>`:''}<div class="row"><span>Hand</span><b>#${G.hand}</b></div>
+   <div class="row"><span>Blinds</span><b class="accent">${fmt(G.sb)}/${fmt(G.bb)}</b></div>
+   ${(G.bba&&!isMobile)?`<div class="row"><span>Ante</span><b>${fmt(G.bba)}</b></div>`:''}
+   <div class="row"><span>Street</span><b>${G.street}</b></div>
+   ${isMobile?'':`<div class="row"><span>שחקנים</span><b>${alive}</b></div>`}`;
+ $('table').innerHTML=`<div class="board">${G.board.map(c=>card(c,true)).join('')}</div><div class="potwrap"><div class="potlabel">TOTAL POT</div><div class="potamt">${chipIcon(potTotalDisplay())}${fmtChip(potTotalDisplay())}</div>${pb?`<div class="potbreak">${pb}</div>`:''}</div><div class="streetlabel">${G.street}</div>${G.handResult?`<div class="handresult">🏆 ${G.handResult}</div>`:''}${seats}`;
+ maybeBotAct();
+ let i=G.current,q=i!=null?G.p[i]:null,mine=remoteMode?(i!=null&&mySeat===i&&!G.paused&&!G.ended):(i!=null&&revealSeat===i&&!G.paused&&!G.ended),c=q?callAmt(i):0,min=q?Math.min(minRaiseTo(),q.bet+q.stack):0,max=q?q.bet+q.stack:0,ql=G.street==='PREFLOP'?['min','2','2.2','2.5','3']:['min','33','50','75','pot'];
+ let decisionKey=i+'_'+G.street+'_'+G.hand;
+ if(decisionKey!==raiseDecisionKey){raiseDecisionKey=decisionKey;raiseCurrentVal=null;lastPresetClicked=null}
+ let raiseVal=raiseCurrentVal!=null?Math.max(min,Math.min(max,raiseCurrentVal)):min;
+ let bbStep=liveShowBB?(0.5):1;
+ let dispVal=liveShowBB?(raiseVal/G.bb).toFixed(1):raiseVal;
+ let dispMin=liveShowBB?(min/G.bb).toFixed(1):min;
+ let dispMax=liveShowBB?(max/G.bb).toFixed(1):max;
+ $('actionbar').innerHTML=`<div class="quick">${ql.map(x=>`<button class="btn ghost ${lastPresetClicked===x?'active':''}" ${!mine?'disabled':''} onclick="preset('${x}')">${x==='min'?'מינימום':x==='pot'?'פוט':G.street==='PREFLOP'?x+'x':x+'%'}</button>`).join('')}</div><div class="actions"><button class="btn red" ${!mine?'disabled':''} onclick="submitAction('fold')">FOLD</button><button class="btn green" ${!mine?'disabled':''} onclick="submitAction('call')">${c?c>=q.stack?'CALL ALL-IN '+fmtChip(q.stack):'CALL '+fmtChip(c):'CHECK'}</button><div><div class="raisebox" onwheel="wheelAdjustRaise(event)"><input id="raiseRange" type="range" min="${dispMin}" max="${dispMax}" step="${bbStep}" value="${dispVal}" ${!mine?'disabled':''} oninput="onRaiseInput(this)"><input id="raiseTo" type="number" min="${dispMin}" max="${dispMax}" step="${bbStep}" value="${dispVal}" ${!mine?'disabled':''} oninput="onRaiseInput(this)" onwheel="wheelAdjustRaise(event)"></div>${mine?`<div class="wheel-hint">גלגלו עם העכבר כדי לשנות מהר · לחיצה על אחוז מעדכנת את הסכום למעלה${liveShowBB?' · מוצג ב-BB':''}</div>`:''}</div><button class="btn" ${!mine||!canRaise(i)?'disabled':''} onclick="submitAction('raise',raiseCurrentVal!=null?raiseCurrentVal:min)">${G.maxBet?'RAISE':'BET'}</button><button class="btn gold" ${!mine?'disabled':''} onclick="submitAction('jam')">ALL-IN</button>${G.street==='SHOWDOWN'&&!G.auto?`<button class="btn gold" onclick="nextManual()">${G.isSpot?'סיכום התרגיל':'יד הבאה'}</button>`:''}</div>`
+}
+
+/* ================= REMOTE PLAY (shared storage sync) ================= */
+let remoteMode=false, myRoom=null, mySeat=null, myName='', isHost=false;
+let waitPollTimer=null, hostLoopTimer=null, clientPollTimer=null;
+
+function roomCodeGen(){let chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',c='';for(let i=0;i<5;i++)c+=chars[Math.floor(Math.random()*chars.length)];return c}
+let lastStorageError=null;
+async function storeGet(key,shared){try{let res=await fetch('/api/kv/get?key='+encodeURIComponent(key));if(!res.ok)throw new Error('HTTP '+res.status);let data=await res.json();if(!data.ok)throw new Error(data.error||'server error');return data.value}catch(e){lastStorageError=(e&&e.message)||String(e);console.error('[storage.get failed]',key,e);return null}}
+async function storeSet(key,value,shared){try{let res=await fetch('/api/kv/set',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key,value})});if(!res.ok)throw new Error('HTTP '+res.status);let data=await res.json();if(!data.ok)throw new Error(data.error||'server error');return true}catch(e){lastStorageError=(e&&e.message)||String(e);console.error('[storage.set failed]',key,e);return false}}
+
+function initRemoteTab(){
+ if($('rMode').options.length){runStorageDiag();return} // already populated
+ $('rMode').innerHTML=Object.entries(MODES).map(([k,v])=>`<option value="${k}" ${k===sel?'selected':''}>${v[0]} — ${fmt(v[1])}/${fmt(v[2])}</option>`).join('');
+ runStorageDiag();
+}
+async function runStorageDiag(){
+ let el=$('storageDiag');if(!el)return;
+ el.textContent='בודק חיבור לשרת…';el.className='storage-diag checking';
+ let testKey='diag_'+Date.now();
+ let setOk=await storeSet(testKey,'ping',true);
+ if(!setOk){el.textContent='⚠ לא הצלחתי להתחבר לשרת: '+(lastStorageError||'לא ידוע');el.className='storage-diag bad';return}
+ let got=await storeGet(testKey,true);
+ if(got!=='ping'){el.textContent='⚠ השרת לא החזיר את מה שנכתב (קיבלתי: '+JSON.stringify(got)+')';el.className='storage-diag bad';return}
+ el.textContent='✓ מחובר לשרת';el.className='storage-diag good';
+}
+function showRemotePane(which){
+ $('remoteToggleCreate').classList.toggle('active',which==='create');
+ $('remoteToggleJoin').classList.toggle('active',which==='join');
+ $('remoteCreatePane').classList.toggle('hidden',which!=='create');
+ $('remoteJoinPane').classList.toggle('hidden',which!=='join');
+}
+
+async function createRoom(){
+ let code=roomCodeGen();
+ let n=+$('rNum').value, modeKey=$('rMode').value, m=MODES[modeKey];
+ let hostName=$('rHostName').value.trim()||'COACH';
+ let seats=Array.from({length:n},()=>null);
+ seats[0]=hostName;
+ let meta={n,modeKey,sb:m[1],bb:m[2],bba:+$('rAnte').value?m[2]:0,levelMinutes:+$('rLevelMin').value,seats,started:false,ended:false,createdAt:Date.now()};
+ let ok=await storeSet(`room_${code}_meta`,JSON.stringify(meta),true);
+ if(!ok){toast('שגיאת אחסון: '+(lastStorageError||'לא ידוע'));console.error('createRoom failed, lastStorageError=',lastStorageError);return}
+ await storeSet(`room_${code}_queue`,JSON.stringify([]),true);
+ myRoom=code;mySeat=0;myName=hostName;isHost=true;remoteMode=true;
+ enterWaitingRoom();
+}
+async function joinRoom(){
+ let code=$('jCode').value.trim().toUpperCase();
+ let name=$('jName').value.trim();
+ if(!code||!name){$('joinError').textContent='נא למלא קוד חדר ושם.';return}
+ let raw=await storeGet(`room_${code}_meta`,true);
+ if(!raw){$('joinError').textContent='לא נמצא חדר עם הקוד הזה.';return}
+ let meta=JSON.parse(raw);
+ if(meta.started){$('joinError').textContent='המשחק כבר התחיל בחדר הזה.';return}
+ let seat=meta.seats.findIndex(s=>s===null);
+ if(seat<0){$('joinError').textContent='החדר מלא.';return}
+ meta.seats[seat]=name;
+ let ok=await storeSet(`room_${code}_meta`,JSON.stringify(meta),true);
+ if(!ok){$('joinError').textContent='שגיאת אחסון: '+(lastStorageError||'לא ידוע');return}
+ myRoom=code;mySeat=seat;myName=name;isHost=false;remoteMode=true;
+ enterWaitingRoom();
+}
+function enterWaitingRoom(){
+ $('remoteCreatePane').classList.add('hidden');$('remoteJoinPane').classList.add('hidden');
+ $('remoteWaitingRoom').classList.remove('hidden');
+ $('waitStartBtn').classList.toggle('hidden',!isHost);
+ $('waitGuestNote').classList.toggle('hidden',isHost);
+ $('waitCode').textContent=myRoom;
+ pollWaitingRoom();
+ clearInterval(waitPollTimer);waitPollTimer=setInterval(pollWaitingRoom,1500);
+}
+async function pollWaitingRoom(){
+ if(!myRoom)return;
+ let raw=await storeGet(`room_${myRoom}_meta`,true);
+ if(!raw)return;
+ let meta=JSON.parse(raw);
+ if(meta.ended){toast('המארח סגר את החדר');leaveRoom();return}
+ $('waitSeats').innerHTML=meta.seats.map((s,i)=>`<div class="waitseat-row ${s?'':'empty'}"><span class="dot"></span><span>Seat ${i+1}: ${s||'ממתין להצטרפות...'}</span>${i===0?'<span class="remote-badge">מארח</span>':''}</div>`).join('');
+ let joined=meta.seats.filter(Boolean).length;
+ $('waitStartBtn').disabled=joined<2;
+ if(meta.started&&!isHost){clearInterval(waitPollTimer);enterRemoteTable(meta)}
+}
+async function hostStartRoom(){
+ let raw=await storeGet(`room_${myRoom}_meta`,true);let meta=JSON.parse(raw);
+ let n=meta.n,names=meta.seats.map((s,i)=>s||`Seat ${i+1}`);
+ G={n,p:[],sb:meta.sb,bb:meta.bb,bba:meta.bba,mode:meta.modeKey,button:Math.floor(Math.random()*n),
+    hand:0,street:'WAITING',board:[],deck:[],pot:0,maxBet:0,lastFullRaise:meta.bb,current:null,acted:new Set(),
+    fullSeq:0,lastActSeq:Array(n).fill(-1),lastFacing:Array(n).fill(null),paused:false,ended:false,log:[],
+    decision:0,turnLeft:0,auto:true,remoteMode:true};
+ let multipliers=Array(n).fill(1);
+ G.p=Array.from({length:n},(_,i)=>({name:names[i],stack:Math.round(meta.bb*20*multipliers[i]),bet:0,total:0,hole:[],fold:false,allin:false,busted:false}));
+ if(meta.levelMinutes>0){G.levels=buildLevels(G.sb,G.bb,G.bba);G.levelIdx=0;G.levelSeconds=meta.levelMinutes*60;G.levelMinutes=meta.levelMinutes}else{G.levels=null;G.levelMinutes=0}
+ meta.started=true;await storeSet(`room_${myRoom}_meta`,JSON.stringify(meta),true);
+ clearInterval(waitPollTimer);
+ enterRemoteTable(meta);
+ newHand();
+ clearInterval(timer);timer=setInterval(tick,1000);
+ clearInterval(levelTimer);if(G.levelMinutes>0)levelTimer=setInterval(levelTick,1000);
+ clearInterval(hostLoopTimer);hostLoopTimer=setInterval(hostLoop,1000);
+ try{if('wakeLock' in navigator)navigator.wakeLock.request('screen').catch(()=>{})}catch(e){}
+}
+function enterRemoteTable(meta){
+ remoteMode=true;
+ $('lobby').classList.add('hidden');$('game').classList.remove('hidden');$('exitBtn').classList.remove('hidden');$('hudmini').classList.remove('hidden');$('topStatus').classList.add('hidden');
+ if(!isHost){
+  clearInterval(clientPollTimer);clientPollTimer=setInterval(clientPoll,1200);
+  clientPoll();
+ }
+}
+async function hostLoop(){
+ if(!G||!isHost||!myRoom)return;
+ let qRaw=await storeGet(`room_${myRoom}_queue`,true);
+ let queue=qRaw?JSON.parse(qRaw):[];
+ if(queue.length){
+  queue.forEach(a=>{if(G&&!G.ended&&G.current===a.seat){revealSeat=a.seat;act(a.type,a.amount)}});
+  await storeSet(`room_${myRoom}_queue`,JSON.stringify([]),true);
+ }
+ if(G){
+  let pub={...G};delete pub.deck;pub.acted=Array.from(G.acted);
+  await storeSet(`room_${myRoom}_state`,JSON.stringify(pub),true);
+ }
+}
+async function clientPoll(){
+ if(!myRoom||isHost)return;
+ let raw=await storeGet(`room_${myRoom}_state`,true);
+ if(!raw)return;
+ try{
+  let g=JSON.parse(raw);g.acted=new Set(g.acted||[]);g.remoteMode=true;
+  G=g;render();
+ }catch(e){}
+}
+async function submitAction(type,amount){
+ if(!remoteMode){revealSeat=G.current;act(type,amount);return}
+ if(isHost){revealSeat=mySeat;act(type,amount);return}
+ let qRaw=await storeGet(`room_${myRoom}_queue`,true);
+ let queue=qRaw?JSON.parse(qRaw):[];
+ queue.push({seat:mySeat,type,amount:amount||0,id:Date.now()+'_'+Math.random()});
+ await storeSet(`room_${myRoom}_queue`,JSON.stringify(queue),true);
+}
+function copyRoomCode(){navigator.clipboard&&navigator.clipboard.writeText(myRoom).then(()=>toast('קוד הועתק')).catch(()=>{})}
+async function leaveRoom(){
+ clearInterval(waitPollTimer);clearInterval(hostLoopTimer);clearInterval(clientPollTimer);clearInterval(timer);clearInterval(levelTimer);
+ if(isHost&&myRoom){try{let raw=await storeGet(`room_${myRoom}_meta`,true);if(raw){let meta=JSON.parse(raw);meta.ended=true;await storeSet(`room_${myRoom}_meta`,JSON.stringify(meta),true)}}catch(e){}}
+ remoteMode=false;myRoom=null;mySeat=null;isHost=false;G=null;
+ $('remoteWaitingRoom').classList.add('hidden');$('exitBtn').classList.add('hidden');$('hudmini').classList.add('hidden');$('topStatus').classList.remove('hidden');
+ $('privacy').classList.remove('open');$('game').classList.add('hidden');$('lobby').classList.remove('hidden');
+ showRemotePane('create');switchTab('remote');
+}
+
+document.addEventListener('keydown',e=>{
+ if(!G||G.paused||G.ended||G.current==null)return;
+ if(revealSeat!==G.current)return;
+ let tag=(e.target&&e.target.tagName)||'';if(tag==='INPUT'||tag==='SELECT')return;
+ if(e.key==='f'||e.key==='F')act('fold');
+ else if(e.key==='c'||e.key==='C')act('call');
+ else if(e.key==='a'||e.key==='A')act('jam');
+ else if(e.key==='r'||e.key==='R'){let el=$('raiseTo');if(el)el.focus()}
+});
+</script>
+</body></html>
