@@ -207,6 +207,8 @@ button,input,select{font:inherit;color:inherit}
 .raisebox input[type=range]::-webkit-slider-thumb{width:26px;height:26px;cursor:pointer}
 .raisebox input[type=range]::-moz-range-thumb{width:26px;height:26px;cursor:pointer;border:none}
 .wheel-hint{font-size:9.5px;color:var(--muted);text-align:center;margin-top:2px}
+@keyframes sendPulse{0%,100%{opacity:.6}50%{opacity:1}}
+.sending-indicator{text-align:center;color:var(--brass-bright);font-size:12px;font-weight:800;padding:4px 0;animation:sendPulse 1s ease-in-out infinite}
 .quick{display:flex;gap:5px;justify-content:center;margin-bottom:7px}
 .quick .btn{padding:6px 11px;font-size:11px}
 .quick .btn.active{background:var(--brass);color:#241a08;border-color:var(--brass);font-weight:800}
@@ -1777,7 +1779,7 @@ function _renderImpl(){if(!G)return;let m=MODES[G.mode]||[G.spotTitle||'תרגי
    ${isMobile?'':`<div class="row"><span>שחקנים</span><b>${alive}</b></div>`}`;
  $('table').innerHTML=`<div class="board">${G.board.map(c=>card(c,true)).join('')}</div><div class="potwrap"><div class="potlabel">TOTAL POT</div><div class="potamt">${chipIcon(potTotalDisplay())}${fmtChip(potTotalDisplay())}</div>${pb?`<div class="potbreak">${pb}</div>`:''}</div><div class="streetlabel">${G.street}</div>${G.handResult?`<div class="handresult">🏆 ${G.handResult}</div>`:''}${seats}`;
  maybeBotAct();
- let i=G.current,q=i!=null?G.p[i]:null,mine=remoteMode?(i!=null&&mySeat===i&&!G.paused&&!G.ended):(i!=null&&revealSeat===i&&!G.paused&&!G.ended),c=q?callAmt(i):0,min=q?Math.min(minRaiseTo(),q.bet+q.stack):0,max=q?q.bet+q.stack:0,ql=G.street==='PREFLOP'?['min','2','2.2','2.5','3']:['min','33','50','75','pot'];
+ let i=G.current,q=i!=null?G.p[i]:null,mine=remoteMode?(i!=null&&mySeat===i&&!G.paused&&!G.ended&&!actionPending):(i!=null&&revealSeat===i&&!G.paused&&!G.ended),c=q?callAmt(i):0,min=q?Math.min(minRaiseTo(),q.bet+q.stack):0,max=q?q.bet+q.stack:0,ql=G.street==='PREFLOP'?['min','2','2.2','2.5','3']:['min','33','50','75','pot'];
  let decisionKey=i+'_'+G.street+'_'+G.hand;
  if(decisionKey!==raiseDecisionKey){raiseDecisionKey=decisionKey;raiseCurrentVal=null;lastPresetClicked=null}
  let raiseVal=raiseCurrentVal!=null?Math.max(min,Math.min(max,raiseCurrentVal)):min;
@@ -1785,7 +1787,7 @@ function _renderImpl(){if(!G)return;let m=MODES[G.mode]||[G.spotTitle||'תרגי
  let dispVal=liveShowBB?(raiseVal/G.bb).toFixed(1):raiseVal;
  let dispMin=liveShowBB?(min/G.bb).toFixed(1):min;
  let dispMax=liveShowBB?(max/G.bb).toFixed(1):max;
- $('actionbar').innerHTML=`<div class="quick">${ql.map(x=>`<button class="btn ghost ${lastPresetClicked===x?'active':''}" ${!mine?'disabled':''} onclick="preset('${x}')">${x==='min'?'מינימום':x==='pot'?'פוט':G.street==='PREFLOP'?x+'x':x+'%'}</button>`).join('')}</div><div class="actions"><button class="btn red" ${!mine?'disabled':''} onclick="submitAction('fold')">FOLD</button><button class="btn green" ${!mine?'disabled':''} onclick="submitAction('call')">${c?c>=q.stack?'CALL ALL-IN '+fmtChip(q.stack):'CALL '+fmtChip(c):'CHECK'}</button><div><div class="raisebox" onwheel="wheelAdjustRaise(event)"><input id="raiseRange" type="range" min="${dispMin}" max="${dispMax}" step="${bbStep}" value="${dispVal}" ${!mine?'disabled':''} oninput="onRaiseInput(this)"><input id="raiseTo" type="number" min="${dispMin}" max="${dispMax}" step="${bbStep}" value="${dispVal}" ${!mine?'disabled':''} oninput="onRaiseInput(this)" onwheel="wheelAdjustRaise(event)"></div>${mine?`<div class="wheel-hint">גלגלו עם העכבר כדי לשנות מהר · לחיצה על אחוז מעדכנת את הסכום למעלה${liveShowBB?' · מוצג ב-BB':''}</div>`:''}</div><button class="btn" ${!mine||!canRaise(i)?'disabled':''} onclick="submitAction('raise',raiseCurrentVal!=null?raiseCurrentVal:min)">${G.maxBet?'RAISE':'BET'}</button><button class="btn gold" ${!mine?'disabled':''} onclick="submitAction('jam')">ALL-IN</button>${G.street==='SHOWDOWN'&&!G.auto?`<button class="btn gold" onclick="nextManual()">${G.isSpot?'סיכום התרגיל':'יד הבאה'}</button>`:''}</div>`
+ $('actionbar').innerHTML=`<div class="quick">${ql.map(x=>`<button class="btn ghost ${lastPresetClicked===x?'active':''}" ${!mine?'disabled':''} onclick="preset('${x}')">${x==='min'?'מינימום':x==='pot'?'פוט':G.street==='PREFLOP'?x+'x':x+'%'}</button>`).join('')}</div>${actionPending?'<div class="sending-indicator">שולח פעולה…</div>':''}<div class="actions"><button class="btn red" ${!mine?'disabled':''} onclick="submitAction('fold')">FOLD</button><button class="btn green" ${!mine?'disabled':''} onclick="submitAction('call')">${c?c>=q.stack?'CALL ALL-IN '+fmtChip(q.stack):'CALL '+fmtChip(c):'CHECK'}</button><div><div class="raisebox" onwheel="wheelAdjustRaise(event)"><input id="raiseRange" type="range" min="${dispMin}" max="${dispMax}" step="${bbStep}" value="${dispVal}" ${!mine?'disabled':''} oninput="onRaiseInput(this)"><input id="raiseTo" type="number" min="${dispMin}" max="${dispMax}" step="${bbStep}" value="${dispVal}" ${!mine?'disabled':''} oninput="onRaiseInput(this)" onwheel="wheelAdjustRaise(event)"></div>${mine?`<div class="wheel-hint">גלגלו עם העכבר כדי לשנות מהר · לחיצה על אחוז מעדכנת את הסכום למעלה${liveShowBB?' · מוצג ב-BB':''}</div>`:''}</div><button class="btn" ${!mine||!canRaise(i)?'disabled':''} onclick="submitAction('raise',raiseCurrentVal!=null?raiseCurrentVal:min)">${G.maxBet?'RAISE':'BET'}</button><button class="btn gold" ${!mine?'disabled':''} onclick="submitAction('jam')">ALL-IN</button>${G.street==='SHOWDOWN'&&!G.auto?`<button class="btn gold" onclick="nextManual()">${G.isSpot?'סיכום התרגיל':'יד הבאה'}</button>`:''}</div>`
 }
 
 /* ================= REMOTE PLAY (shared storage sync) ================= */
@@ -1836,17 +1838,34 @@ async function joinRoom(){
  let code=$('jCode').value.trim().toUpperCase();
  let name=$('jName').value.trim();
  if(!code||!name){$('joinError').textContent='נא למלא קוד חדר ושם.';return}
- let raw=await storeGet(`room_${code}_meta`,true);
- if(!raw){$('joinError').textContent='לא נמצא חדר עם הקוד הזה.';return}
- let meta=JSON.parse(raw);
- if(meta.started){$('joinError').textContent='המשחק כבר התחיל בחדר הזה.';return}
- let seat=meta.seats.findIndex(s=>s===null);
- if(seat<0){$('joinError').textContent='החדר מלא.';return}
- meta.seats[seat]=name;
- let ok=await storeSet(`room_${code}_meta`,JSON.stringify(meta),true);
- if(!ok){$('joinError').textContent='שגיאת אחסון: '+(lastStorageError||'לא ידוע');return}
- myRoom=code;mySeat=seat;myName=name;isHost=false;remoteMode=true;
- enterWaitingRoom();
+ try{
+   let res=await fetch('/api/kv/claim-seat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:`room_${code}_meta`,name})});
+   let data=await res.json().catch(()=>null);
+   if(!res.ok||!data||!data.ok){
+     if(res.status===404){$('joinError').textContent='לא נמצא חדר עם הקוד הזה.';return}
+     $('joinError').textContent='שגיאת אחסון: '+(lastStorageError||'לא ידוע');return;
+   }
+   if(data.seat<0){
+     $('joinError').textContent=data.reason==='started'?'המשחק כבר התחיל בחדר הזה.':'החדר מלא.';
+     return;
+   }
+   myRoom=code;mySeat=data.seat;myName=name;isHost=false;remoteMode=true;
+   enterWaitingRoom();
+ }catch(e){
+   // Fall back to the older get+set path only if the atomic endpoint itself is
+   // unreachable (e.g. an older deployed server.js mid-redeploy).
+   let raw=await storeGet(`room_${code}_meta`,true);
+   if(!raw){$('joinError').textContent='לא נמצא חדר עם הקוד הזה.';return}
+   let meta=JSON.parse(raw);
+   if(meta.started){$('joinError').textContent='המשחק כבר התחיל בחדר הזה.';return}
+   let seat=meta.seats.findIndex(s=>s===null);
+   if(seat<0){$('joinError').textContent='החדר מלא.';return}
+   meta.seats[seat]=name;
+   let ok=await storeSet(`room_${code}_meta`,JSON.stringify(meta),true);
+   if(!ok){$('joinError').textContent='שגיאת אחסון: '+(lastStorageError||'לא ידוע');return}
+   myRoom=code;mySeat=seat;myName=name;isHost=false;remoteMode=true;
+   enterWaitingRoom();
+ }
 }
 function enterWaitingRoom(){
  $('remoteCreatePane').classList.add('hidden');$('remoteJoinPane').classList.add('hidden');
@@ -1884,14 +1903,14 @@ async function hostStartRoom(){
  newHand();
  clearInterval(timer);timer=setInterval(tick,1000);
  clearInterval(levelTimer);if(G.levelMinutes>0)levelTimer=setInterval(levelTick,1000);
- clearInterval(hostLoopTimer);hostLoopTimer=setInterval(hostLoop,1000);
+ clearInterval(hostLoopTimer);hostLoopTimer=setInterval(hostLoop,500);
  try{if('wakeLock' in navigator)navigator.wakeLock.request('screen').catch(()=>{})}catch(e){}
 }
 function enterRemoteTable(meta){
  remoteMode=true;
  $('lobby').classList.add('hidden');$('game').classList.remove('hidden');$('exitBtn').classList.remove('hidden');$('hudmini').classList.remove('hidden');$('topStatus').classList.add('hidden');
  if(!isHost){
-  clearInterval(clientPollTimer);clientPollTimer=setInterval(clientPoll,1200);
+  clearInterval(clientPollTimer);clientPollTimer=setInterval(clientPoll,600);
   clientPoll();
  }
 }
@@ -1917,13 +1936,28 @@ async function clientPoll(){
   G=g;render();
  }catch(e){}
 }
+let actionPending=false;
 async function submitAction(type,amount){
  if(!remoteMode){revealSeat=G.current;act(type,amount);return}
  if(isHost){revealSeat=mySeat;act(type,amount);return}
- let qRaw=await storeGet(`room_${myRoom}_queue`,true);
- let queue=qRaw?JSON.parse(qRaw):[];
- queue.push({seat:mySeat,type,amount:amount||0,id:Date.now()+'_'+Math.random()});
- await storeSet(`room_${myRoom}_queue`,JSON.stringify(queue),true);
+ if(actionPending)return; // a click is already in flight - never queue the same intent twice
+ actionPending=true;render();
+ try{
+   const item={seat:mySeat,type,amount:amount||0,id:Date.now()+'_'+Math.random()};
+   let res=await fetch('/api/kv/append',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:`room_${myRoom}_queue`,item})});
+   let data=await res.json().catch(()=>null);
+   if(!data||!data.ok){
+     // Fall back to the old get+set path only if the append endpoint itself is
+     // unavailable (e.g. an older deployed server.js) - keeps this working
+     // during a rolling redeploy instead of silently dropping the action.
+     let qRaw=await storeGet(`room_${myRoom}_queue`,true);
+     let queue=qRaw?JSON.parse(qRaw):[];
+     queue.push(item);
+     await storeSet(`room_${myRoom}_queue`,JSON.stringify(queue),true);
+   }
+ } finally {
+   actionPending=false;render();
+ }
 }
 function copyRoomCode(){navigator.clipboard&&navigator.clipboard.writeText(myRoom).then(()=>toast('קוד הועתק')).catch(()=>{})}
 async function leaveRoom(){

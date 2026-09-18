@@ -75,6 +75,53 @@ const server = http.createServer(async (req, res) => {
       return sendJSON(res, 200, { ok: true });
     }
 
+    // Atomically append one item to a JSON array stored at `key`, creating it if
+    // missing. Runs as a single server-side read-modify-write with no gap a
+    // second request can land in, unlike two separate get+set calls from the
+    // client - that pattern was silently losing queued player actions and
+    // dropped seat claims whenever two people acted around the same moment.
+    if (url.pathname === "/api/kv/append" && req.method === "POST") {
+      const raw = await readBody(req);
+      let body;
+      try { body = JSON.parse(raw); } catch { return sendJSON(res, 400, { ok: false, error: "bad json" }); }
+      const { key, item } = body || {};
+      if (!key || typeof key !== "string" || key.length > 200) return sendJSON(res, 400, { ok: false, error: "bad key" });
+      if (item === undefined) return sendJSON(res, 400, { ok: false, error: "missing item" });
+      let arr = [];
+      const existing = store.has(key) ? store.get(key) : null;
+      if (existing) { try { arr = JSON.parse(existing); if (!Array.isArray(arr)) arr = []; } catch { arr = []; } }
+      arr.push(item);
+      const serialized = JSON.stringify(arr);
+      if (serialized.length > 500_000) return sendJSON(res, 400, { ok: false, error: "queue too large" });
+      store.set(key, serialized);
+      createdAt.set(key, Date.now());
+      return sendJSON(res, 200, { ok: true, value: serialized });
+    }
+
+    // Atomically claim the first free seat in a room, avoiding the race where
+    // two people joining within the same moment both read "seat 3 is free" and
+    // one of their writes silently overwrites the other's.
+    if (url.pathname === "/api/kv/claim-seat" && req.method === "POST") {
+      const raw2 = await readBody(req);
+      let body2;
+      try { body2 = JSON.parse(raw2); } catch { return sendJSON(res, 400, { ok: false, error: "bad json" }); }
+      const { key: seatKey, name: seatName } = body2 || {};
+      if (!seatKey || typeof seatKey !== "string" || seatKey.length > 200) return sendJSON(res, 400, { ok: false, error: "bad key" });
+      if (typeof seatName !== "string" || !seatName || seatName.length > 100) return sendJSON(res, 400, { ok: false, error: "bad name" });
+      const existingMeta = store.has(seatKey) ? store.get(seatKey) : null;
+      if (!existingMeta) return sendJSON(res, 404, { ok: false, error: "room not found" });
+      let meta;
+      try { meta = JSON.parse(existingMeta); } catch { return sendJSON(res, 500, { ok: false, error: "corrupt room state" }); }
+      if (meta.started) return sendJSON(res, 200, { ok: true, seat: -1, reason: "started" });
+      const seat = meta.seats.findIndex((s) => s === null);
+      if (seat < 0) return sendJSON(res, 200, { ok: true, seat: -1, reason: "full" });
+      meta.seats[seat] = seatName;
+      const serializedMeta = JSON.stringify(meta);
+      store.set(seatKey, serializedMeta);
+      createdAt.set(seatKey, Date.now());
+      return sendJSON(res, 200, { ok: true, seat, value: serializedMeta });
+    }
+
     if (url.pathname === "/api/health") {
       return sendJSON(res, 200, { ok: true, keys: store.size });
     }
