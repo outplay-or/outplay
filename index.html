@@ -149,7 +149,11 @@ button,input,select{font:inherit;color:inherit}
 .rail{position:relative;width:min(1540px,97%,155vh);aspect-ratio:2.05;border-radius:49%;padding:11px;background:radial-gradient(ellipse at 50% 30%,var(--rail-light),var(--rail) 78%);box-shadow:0 30px 90px rgba(0,0,0,.55),inset 0 1px 3px rgba(255,255,255,.08)}
 .table{position:relative;width:100%;height:100%;border-radius:49%;background:radial-gradient(ellipse at 50% 15%,var(--felt-1),var(--felt-2) 78%);box-shadow:inset 0 0 130px rgba(0,0,0,.6),inset 0 0 0 2px rgba(184,146,61,.35),inset 0 0 50px rgba(0,0,0,.25)}
 .table::before{content:'';position:absolute;inset:0;border-radius:49%;background:repeating-linear-gradient(115deg,rgba(255,255,255,.015) 0 2px,transparent 2px 5px);pointer-events:none}
-.seat{position:absolute;transform:translate(-50%,-50%);text-align:center;min-width:130px;direction:ltr}
+.seat{position:absolute;transform:translate(-50%,-50%);text-align:center;min-width:130px;direction:ltr;transform-origin:center}
+body.lscale-1 .seat{transform:translate(-50%,-50%) scale(.82)}
+body.lscale-2 .seat{transform:translate(-50%,-50%) scale(.68)}
+body.lscale-3 .seat{transform:translate(-50%,-50%) scale(.56)}
+body.lscale-4 .seat{transform:translate(-50%,-50%) scale(.46)}
 .cards{display:flex;justify-content:center;gap:4px;margin-bottom:4px}
 .avatar{width:54px;height:54px;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:19px;color:#fff;border:2px solid #2a2d33;box-shadow:0 2px 6px rgba(0,0,0,.4),inset 0 -6px 10px rgba(0,0,0,.25),inset 0 2px 3px rgba(255,255,255,.12);position:relative}
 @keyframes turnPulse{0%,100%{box-shadow:0 0 0 3px var(--brass),0 0 16px rgba(200,161,83,.55)}50%{box-shadow:0 0 0 4px var(--brass-bright),0 0 24px rgba(220,185,104,.85)}}
@@ -157,8 +161,28 @@ button,input,select{font:inherit;color:inherit}
 @keyframes clockPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
 .turnclock{position:absolute;top:-8px;right:-10px;min-width:22px;height:22px;border-radius:50%;background:#0c0d0f;border:2px solid var(--brass-bright);color:var(--brass-bright);font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center;z-index:8;font-variant-numeric:tabular-nums;box-shadow:0 2px 6px rgba(0,0,0,.5)}
 .turnclock.urgent{border-color:var(--red);color:#fff;background:var(--red);animation:clockPulse .6s ease-in-out infinite}
+.timebank-count{position:absolute;top:-8px;left:-10px;min-width:20px;height:18px;padding:0 4px;border-radius:9px;background:#1a2420;border:1px solid rgba(159,214,184,.5);color:#9fd6b8;font-size:9.5px;font-weight:800;display:flex;align-items:center;justify-content:center;z-index:8}
+.equity-badge{text-align:center;font-size:13px;font-weight:900;color:#9fc3e0;margin-bottom:2px;text-shadow:0 1px 3px rgba(0,0,0,.6);transition:color .3s}
+.equity-badge.leading{color:var(--brass-bright)}
+.btn.timebank{background:linear-gradient(180deg,#2c3a35,#1a2420);color:#9fd6b8;border:1px solid rgba(159,214,184,.4);font-size:12px;padding:9px 12px}
+.btn.timebank:hover{background:linear-gradient(180deg,#38473f,#22302a)}
 .seatnum{position:absolute;top:-3px;left:-3px;width:17px;height:17px;border-radius:50%;background:var(--brass-bright);color:#1a1204;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px #0e0e0e}
-.nameplate{background:#0c0d0f;border:1px solid #24272c;border-radius:6px;padding:4px 9px;margin-top:-8px}
+.action-badge{margin-top:2px;text-align:center;font-size:9.5px;font-weight:900;letter-spacing:.04em;padding:2px 8px;border-radius:10px;display:inline-block;box-shadow:0 2px 6px rgba(0,0,0,.4)}
+.action-badge.act-fold{background:rgba(60,40,40,.9);color:#c99;border:1px solid rgba(184,69,58,.4)}
+.action-badge.act-neutral{background:rgba(40,60,50,.9);color:#9fd6b8;border:1px solid rgba(63,143,94,.4)}
+.action-badge.act-raise{background:linear-gradient(180deg,#3fa868,#2c7a4a);color:#fff;border:1px solid rgba(63,168,104,.6)}
+.action-badge.act-allin{background:linear-gradient(180deg,var(--brass-bright),var(--brass));color:#241a08;border:1px solid rgba(255,201,77,.7);animation:clockPulse .8s ease-in-out infinite}
+.nameplate{background:#0c0d0f;border:1px solid #24272c;border-radius:6px;padding:4px 9px;margin-top:-8px;transition:box-shadow .2s,border-color .2s}
+.decision-bar{height:3px;border-radius:2px;background:rgba(255,255,255,.08);margin-top:3px;overflow:hidden}
+.decision-bar-fill{height:100%;background:linear-gradient(90deg,#3fa868,#7fd39c);transition:width 1s linear}
+.decision-bar-fill.urgent{background:linear-gradient(90deg,var(--red),#ff6b5e)}
+.preaction-row{display:flex;gap:8px;justify-content:center;padding:6px 0 2px}
+.preaction-chip{display:flex;align-items:center;gap:6px;background:#141816;border:1px solid var(--line);border-radius:20px;padding:6px 14px;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;transition:all .15s}
+.preaction-chip:hover{border-color:rgba(240,168,50,.4)}
+.preaction-chip.active{background:rgba(240,168,50,.14);border-color:var(--brass-bright);color:var(--brass-bright)}
+.preaction-box{width:14px;height:14px;border-radius:3px;border:1px solid currentColor;display:inline-flex;align-items:center;justify-content:center;font-size:10px}
+.seat.turn .nameplate{border-color:var(--brass-bright);animation:turnPulseBox 1.3s ease-in-out infinite}
+@keyframes turnPulseBox{0%,100%{box-shadow:0 0 0 2px rgba(240,168,50,.55),0 0 14px rgba(240,168,50,.35)}50%{box-shadow:0 0 0 3px var(--brass-bright),0 0 26px rgba(240,168,50,.7)}}
 .name{font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:4px;white-space:nowrap}
 .chips{font-size:18px;font-weight:800;font-variant-numeric:tabular-nums}
 .hudstat{font-size:9.5px;font-weight:700;font-variant-numeric:tabular-nums;color:#7fb8e0;letter-spacing:.02em;margin-top:1px}
@@ -172,18 +196,23 @@ button,input,select{font:inherit;color:inherit}
 .bet{min-height:26px;margin-top:6px}
 .betline{font-size:15px;font-weight:800;color:#fff;display:inline-flex;align-items:center;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:4px 10px 4px 6px;box-shadow:0 3px 8px rgba(0,0,0,.4)}
 
-.chip{position:relative;display:inline-block;width:20px;height:20px;vertical-align:middle;margin-inline-end:7px;flex:none}
-.chip::before,.chip::after{content:'';position:absolute;left:0;width:20px;height:10px;border-radius:50%;background:repeating-conic-gradient(var(--chip) 0deg 40deg,#fff 40deg 46deg) ;box-shadow:inset 0 0 0 2px rgba(255,255,255,.25),0 1px 1px rgba(0,0,0,.5),0 4px 0 -2px var(--chip-dark),0 4px 1px -1px rgba(0,0,0,.4)}
+.chip{position:relative;display:inline-block;width:20px;height:20px;vertical-align:middle;margin-inline-end:7px;flex:none;--chip-c:var(--chip);--chip-cd:var(--chip-dark)}
+.chip.chip-low{--chip-c:#d9d4c4;--chip-cd:#a8a290}
+.chip.chip-mid{--chip-c:#d9534f;--chip-cd:#a83c39}
+.chip.chip-high{--chip-c:#3fa868;--chip-cd:#2c7a4a}
+.chip.chip-huge{--chip-c:#33343a;--chip-cd:#1c1d21}
+.chip.chip-massive{--chip-c:#f0a832;--chip-cd:#c8871f}
+.chip::before,.chip::after{content:'';position:absolute;left:0;width:20px;height:10px;border-radius:50%;background:repeating-conic-gradient(var(--chip-c) 0deg 40deg,#fff 40deg 46deg);box-shadow:inset 0 0 0 2px rgba(255,255,255,.25),inset 0 0 0 5px rgba(0,0,0,.12),0 1px 1px rgba(0,0,0,.5),0 4px 0 -2px var(--chip-cd),0 4px 1px -1px rgba(0,0,0,.4)}
 .chip::before{top:0;z-index:2}
-.chip::after{top:5px;background:repeating-conic-gradient(var(--chip-dark) 0deg 40deg,#fff 40deg 46deg);z-index:1}
+.chip::after{top:5px;background:repeating-conic-gradient(var(--chip-cd) 0deg 40deg,#fff 40deg 46deg);z-index:1}
 
-.card{position:relative;width:58px;height:82px;border-radius:8px;background:var(--ink);box-shadow:0 4px 10px rgba(0,0,0,.5),inset 0 0 0 1px rgba(255,255,255,.08);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
-.card .rank{font-weight:800;font-size:23px;color:#fff;line-height:1}
-.card .suiticon{font-size:24px;color:#fff;line-height:1}
-.card.suit-h{background:linear-gradient(180deg,#e5443c,#c22e28)}
-.card.suit-d{background:linear-gradient(180deg,#3f7fd9,#2a63b8)}
-.card.suit-c{background:linear-gradient(180deg,#3fa25e,#278246)}
-.card.suit-s{background:linear-gradient(180deg,#2b2b2e,#151517)}
+.card{position:relative;width:58px;height:82px;border-radius:7px;box-shadow:0 4px 10px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.18),inset 0 0 0 1px rgba(0,0,0,.15);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:1px solid rgba(0,0,0,.2)}
+.card .rank{font-weight:900;font-size:23px;line-height:1;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+.card .suiticon{font-size:24px;line-height:1;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+.card.suit-h{background:linear-gradient(165deg,#e6544a,#c22e28 65%)}
+.card.suit-d{background:linear-gradient(165deg,#3f7fe0,#2451ad 65%)}
+.card.suit-c{background:linear-gradient(165deg,#3fb26a,#217a44 65%)}
+.card.suit-s{background:linear-gradient(165deg,#3a3b40,#18191c 65%)}
 .card.back{background-color:#7a1f2b;background-image:repeating-linear-gradient(45deg,#8f2634 0 6px,#6c1620 6px 12px),repeating-linear-gradient(-45deg,#8f2634 0 6px,transparent 6px 12px);border:3px solid var(--ivory)}
 .board .card{width:66px;height:92px}.board .card .rank{font-size:28px}.board .card .suiticon{font-size:30px}
 @keyframes cardFlip{0%{transform:rotateY(85deg);opacity:0}60%{transform:rotateY(-6deg);opacity:1}100%{transform:rotateY(0)}}
@@ -227,7 +256,20 @@ button,input,select{font:inherit;color:inherit}
 .modal.open{display:flex}
 .modalbox{width:min(680px,94vw);max-height:86vh;overflow:auto;background:#0e1b16;border:1px solid var(--brassline);border-radius:16px;padding:22px}
 .modalbox h2{margin-top:0}
-.histrow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 4px;border-bottom:1px solid var(--line)}
+.histrow{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 10px;border-bottom:1px solid var(--line);cursor:pointer;border-radius:8px;transition:background .15s}
+.histrow:hover{background:rgba(240,168,50,.06)}
+.histrow-main{flex:1;min-width:0}
+.histrow-top{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.histrow-headline{font-size:11.5px;color:var(--muted)}
+.histrow-bottom{display:flex;align-items:center;gap:8px}
+.histrow-winner{font-size:12.5px;color:#7fd39c;font-weight:700}
+.histrow-cards{display:flex;gap:2px}
+.histrow-cards .card{width:22px;height:31px}
+.histrow-cards .card .rank{font-size:10px}
+.histrow-cards .card .suiticon{font-size:10px}
+.histrow-side{text-align:left}
+.histrow-pot{font-weight:900;font-size:15px;color:var(--ivory);direction:ltr}
+.histrow-pot-label{font-size:9.5px;color:var(--muted)}
 .histrow:last-child{border-bottom:none}
 .revrow{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--line)}
 .revrow:last-child{border-bottom:none}
@@ -267,8 +309,25 @@ button,input,select{font:inherit;color:inherit}
 .street-board .card{width:22px;height:30px}
 .street-board .card .rank{font-size:10px}.street-board .card .suiticon{font-size:10px}
 .street-line{font-size:11px;color:#c9d3ca;line-height:1.7;border-radius:4px;padding:1px 4px;margin:0 -4px;transition:background .2s,color .2s}
+.street-line.ln-fold{color:#a08888}
+.street-line.ln-raise{color:#7fd39c;font-weight:700}
+.street-line.ln-allin{color:var(--brass-bright);font-weight:800}
+.street-line.ln-neutral{color:#9fc3e0}
 .street-line.now-playing{background:rgba(240,168,50,.22);color:var(--brass-bright);font-weight:800}
 .replay-progress{height:4px;border-radius:2px;background:rgba(255,255,255,.08);margin:2px auto 0;max-width:280px;overflow:hidden}
+.showdown-reveal{margin-top:14px;background:linear-gradient(165deg,#131816,var(--panel) 40%);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.showdown-row{display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:6px;font-size:13px}
+.showdown-row+.showdown-row{margin-top:2px}
+.showdown-row.won{background:rgba(240,168,50,.14);border:1px solid rgba(240,168,50,.35)}
+.showdown-trophy{font-size:14px}
+.showdown-name{font-weight:800;min-width:72px}
+.showdown-cards{display:flex;gap:3px}
+.showdown-cards .card{width:28px;height:40px}
+.showdown-cards .card .rank{font-size:13px}
+.showdown-cards .card .suiticon{font-size:13px}
+.showdown-desc{color:var(--muted);flex:1}
+.showdown-row.won .showdown-desc{color:var(--ivory)}
+.showdown-amt{font-weight:900;color:#7fd39c;direction:ltr}
 .replay-progress-fill{height:100%;background:linear-gradient(90deg,var(--brass),var(--brass-bright));transition:width .25s ease}
 .street-line.muted{color:var(--muted)}
 
@@ -414,7 +473,8 @@ button,input,select{font:inherit;color:inherit}
         <div class="form">
           <div class="field"><label>שחקנים</label><select id="num" onchange="renderPlayers()"><option>8</option><option selected>6</option><option>4</option><option>2</option></select></div>
           <div class="field"><label>עליית רמות (בליינדים)</label><select id="levelMin"><option value="0">כבוי — בליינד קבוע</option><option value="5">כל 5 דקות (טורבו)</option><option value="8">כל 8 דקות (מהיר)</option><option value="10" selected>כל 10 דקות (רגיל)</option><option value="15">כל 15 דקות (עמוק)</option></select></div>
-          <div class="field"><label>שעון החלטה</label><select id="clock"><option value="0" selected>כבוי — פיילוט</option><option value="30">30 שניות</option><option value="18">18 שניות</option></select></div>
+          <div class="field"><label>שעון החלטה</label><select id="clock"><option value="0">כבוי</option><option value="20">20 שניות</option><option value="30" selected>30 שניות (סטנדרט)</option></select></div>
+          <div class="field"><label>בנק זמן (הבזקים)</label><select id="timeBankChips"><option value="0">כבוי</option><option value="2">2 × 30 שניות</option><option value="3" selected>3 × 30 שניות</option><option value="5">5 × 30 שניות</option></select></div>
           <div class="field"><label>אנטה על ה-BB</label><select id="ante"><option value="1" selected>פועל</option><option value="0">כבוי</option></select></div>
           <div class="field"><label>יד הבאה אוטומטית</label><select id="auto"><option value="1" selected>פועל</option><option value="0">כבוי</option></select></div>
           <div class="field"><label>זמן צפייה בתוצאת היד</label><select id="reviewMs"><option value="2000">2 שניות</option><option value="4000" selected>4 שניות</option><option value="6000">6 שניות</option><option value="9000">9 שניות</option></select></div>
@@ -446,8 +506,10 @@ button,input,select{font:inherit;color:inherit}
           <div class="form" style="margin-top:12px">
             <div class="field full" style="grid-column:1/-1"><label>השם שלך (המארח)</label><input id="rHostName" value="COACH"></div>
             <div class="field"><label>שחקנים</label><select id="rNum"><option>8</option><option selected>6</option><option>4</option><option>2</option></select></div>
-            <div class="field"><label>עומק פתיחה</label><select id="rMode"></select></div>
+            <div class="field"><label>עומק פתיחה</label><select id="rMode" onchange="sel=this.value"></select></div>
             <div class="field"><label>עליית רמות</label><select id="rLevelMin"><option value="0">כבוי</option><option value="5">כל 5 דקות (טורבו)</option><option value="8">כל 8 דקות (מהיר)</option><option value="10" selected>כל 10 דקות (רגיל)</option><option value="15">כל 15 דקות (עמוק)</option></select></div>
+            <div class="field"><label>שעון החלטה</label><select id="rClock"><option value="0">כבוי</option><option value="20">20 שניות</option><option value="30" selected>30 שניות (סטנדרט)</option></select></div>
+            <div class="field"><label>בנק זמן (הבזקים)</label><select id="rTimeBankChips"><option value="0">כבוי</option><option value="2">2 × 30 שניות</option><option value="3" selected>3 × 30 שניות</option><option value="5">5 × 30 שניות</option></select></div>
             <div class="field"><label>אנטה על ה-BB</label><select id="rAnte"><option value="1" selected>פועל</option><option value="0">כבוי</option></select></div>
           </div>
           <button class="btn gold wide" style="margin-top:14px" onclick="createRoom()">צור חדר</button>
@@ -880,7 +942,7 @@ function importLibrary(ev){
 function aliveIds(){return G.p.map((q,i)=>q.stack>0?i:null).filter(x=>x!==null)}function nextSeat(i,actable=false){for(let k=1;k<=G.n;k++){let j=(i+k)%G.n,q=G.p[j];if(q.stack>0&&(!actable||(!q.fold&&!q.allin)))return j}return null}
 function contrib(i,amt,live=true){let q=G.p[i],v=Math.max(0,Math.min(q.stack,amt));q.stack-=v;q.total+=v;G.pot+=v;if(live)q.bet+=v;if(q.stack===0)q.allin=true;return v}
 function currentBlindSeats(){let a=aliveIds(),sb,bb;if(a.length===2){sb=G.button;bb=nextSeat(sb)}else{sb=nextSeat(G.button);bb=nextSeat(sb)}return{sb,bb}}
-function startSession(){let n=+$('num').value,m=MODES[sel],base=m[3]*m[2];G={n,p:[],sb:m[1],bb:m[2],bba:+$('ante').value?m[2]:0,mode:sel,button:ri(n),hand:0,street:'WAITING',board:[],deck:[],pot:0,maxBet:0,lastFullRaise:m[2],current:null,acted:new Set(),fullSeq:0,lastActSeq:Array(n).fill(-1),lastFacing:Array(n).fill(null),paused:false,ended:false,log:[],decision:+$('clock').value,turnLeft:+$('clock').value,auto:+$('auto').value};
+function startSession(){let n=+$('num').value,m=MODES[sel],base=m[3]*m[2];G={n,p:[],sb:m[1],bb:m[2],bba:+$('ante').value?m[2]:0,mode:sel,button:ri(n),hand:0,street:'WAITING',board:[],deck:[],pot:0,maxBet:0,lastFullRaise:m[2],current:null,acted:new Set(),fullSeq:0,lastActSeq:Array(n).fill(-1),lastFacing:Array(n).fill(null),paused:false,ended:false,log:[],decision:+$('clock').value,turnLeft:+$('clock').value,auto:+$('auto').value,timeBankChips:Array(n).fill(+($('timeBankChips')?.value||0))};
  let multipliers;
  if(sel.startsWith('b')||sel==='ft40'){
    // Varied stacks (bubble / final table): spread evenly from 0.55x to 1.5x of the
@@ -916,7 +978,7 @@ function startSession(){let n=+$('num').value,m=MODES[sel],base=m[3]*m[2];G={n,p
  clearInterval(levelTimer);if(G.levelMinutes>0)levelTimer=setInterval(levelTick,1000);
  try{if('wakeLock' in navigator)navigator.wakeLock.request('screen').catch(()=>{})}catch(e){}
 }
-function newHand(){if(G.isSpot){showSpotDebrief();return}if(G.ended)return;let alive=aliveIds();if(alive.length<=1)return finishTournament(alive[0]);if(!alive.includes(G.button))G.button=alive[0];G.hand++;G.street='PREFLOP';G.board=[];G.deck=deck();G.pot=0;G.maxBet=0;G.lastFullRaise=G.bb;G.acted=new Set();G.fullSeq=0;G.lastActSeq=Array(G.n).fill(-1);G.lastFacing=Array(G.n).fill(null);G.log=[`Hand #${G.hand}`];revealSeat=null;
+function newHand(){if(G.isSpot){showSpotDebrief();return}if(G.ended)return;let alive=aliveIds();if(alive.length<=1)return finishTournament(alive[0]);if(!alive.includes(G.button))G.button=alive[0];G.hand++;G.street='PREFLOP';G.board=[];G.deck=deck();G.pot=0;G.maxBet=0;G.lastFullRaise=G.bb;G.acted=new Set();G.fullSeq=0;G.lastActSeq=Array(G.n).fill(-1);G.lastFacing=Array(G.n).fill(null);G.actionLabel=Array(G.n).fill(null);G.log=[`Hand #${G.hand}`];revealSeat=null;
  G.p.forEach(q=>{q.bet=0;q.total=0;q.fold=q.stack<=0;q.allin=false;q.hole=q.stack>0?[G.deck.pop(),G.deck.pop()]:[]});
  let {sb,bb}=currentBlindSeats();if(G.bba)contrib(bb,G.bba,false);contrib(sb,G.sb,true);contrib(bb,G.bb,true);G.maxBet=Math.max(G.p[sb].bet,G.p[bb].bet);G.current=alive.length===2?G.button:nextSeat(bb,true);G.turnLeft=G.decision;wasShown={};handPotTrail=[];render();privacy()
 }
@@ -925,10 +987,11 @@ function canRaise(i){let q=G.p[i],c=callAmt(i);if(q.fold||q.allin||q.stack<=c)re
 function mark(i){G.acted.add(i);G.lastFacing[i]=G.maxBet;G.lastActSeq[i]=G.fullSeq}
 function validateRaise(i,target){let q=G.p[i],all=q.bet+q.stack;target=Math.min(all,Math.round(Number(target)||0));if(!canRaise(i))return{ok:false};if(G.maxBet===0){let full=target>=G.bb;if(!full&&target<all)return{ok:false};return{ok:target>0,target,inc:target,full}}if(target<=G.maxBet)return{ok:false};let inc=target-G.maxBet,full=inc>=G.lastFullRaise;if(!full&&target<all)return{ok:false};return{ok:true,target,inc,full}}
 function act(type,target){if(G.paused||G.ended||G.current==null||revealSeat!==G.current)return;let i=G.current,q=G.p[i],c=callAmt(i);
- if(type==='fold'){q.fold=true;mark(i);G.log.push(`${q.name} folds`)}
- if(type==='call'){let x=contrib(i,c,true);G.log.push(c?`${q.name} calls ${fmt(x)}${q.allin?' all-in':''}`:`${q.name} checks`);mark(i)}
- if(type==='jam'){let all=q.bet+q.stack;if(all<=G.maxBet){let x=contrib(i,c,true);G.log.push(`${q.name} calls ${fmt(x)} all-in`);mark(i)}else{let v=validateRaise(i,all);if(!v.ok)return;if(v.full){G.lastFullRaise=v.inc;G.fullSeq++;G.acted=new Set()}contrib(i,v.target-q.bet,true);G.maxBet=q.bet;mark(i);G.log.push(`${q.name} all-in to ${fmt(q.bet)}`)}}
- if(type==='raise'){let v=validateRaise(i,target);if(!v.ok){toast('Raise לא חוקי');return}if(v.full){G.lastFullRaise=v.inc;G.fullSeq++;G.acted=new Set()}contrib(i,v.target-q.bet,true);G.maxBet=q.bet;mark(i);G.log.push(`${q.name} ${G.maxBet===v.target?'raises to':'bets'} ${fmt(q.bet)}`)}
+ if(!G.actionLabel)G.actionLabel=Array(G.n).fill(null);
+ if(type==='fold'){q.fold=true;mark(i);G.log.push(`${q.name} folds`);G.actionLabel[i]='FOLD'}
+ if(type==='call'){let x=contrib(i,c,true);G.log.push(c?`${q.name} calls ${fmt(x)}${q.allin?' all-in':''}`:`${q.name} checks`);mark(i);G.actionLabel[i]=c?(q.allin?'ALL-IN':'CALL'):'CHECK'}
+ if(type==='jam'){let all=q.bet+q.stack;if(all<=G.maxBet){let x=contrib(i,c,true);G.log.push(`${q.name} calls ${fmt(x)} all-in`);mark(i);G.actionLabel[i]='ALL-IN'}else{let v=validateRaise(i,all);if(!v.ok)return;if(v.full){G.lastFullRaise=v.inc;G.fullSeq++;G.acted=new Set()}contrib(i,v.target-q.bet,true);G.maxBet=q.bet;mark(i);G.log.push(`${q.name} all-in to ${fmt(q.bet)}`);G.actionLabel[i]='ALL-IN'}}
+ if(type==='raise'){let v=validateRaise(i,target);if(!v.ok){toast('Raise לא חוקי');return}if(v.full){G.lastFullRaise=v.inc;G.fullSeq++;G.acted=new Set()}contrib(i,v.target-q.bet,true);G.maxBet=q.bet;mark(i);let isRaise=G.maxBet===v.target;G.log.push(`${q.name} ${isRaise?'raises to':'bets'} ${fmt(q.bet)}`);G.actionLabel[i]=q.allin?'ALL-IN':(isRaise?'RAISE':'BET')}
  revealSeat=null;advance()
 }
 function actors(){return G.p.map((q,i)=>({q,i})).filter(x=>!x.q.fold&&!x.q.allin&&x.q.stack>0)}function liveIds(){return G.p.map((q,i)=>!q.fold?i:null).filter(x=>x!==null)}
@@ -936,14 +999,90 @@ function roundDone(){let a=actors();return !a.length||a.every(x=>G.acted.has(x.i
 function noBetPossible(){let a=actors();return a.length===0||(a.length===1&&callAmt(a[0].i)===0)}
 function advance(){let live=liveIds();if(live.length===1)return awardFold(live[0]);if(roundDone()){if(noBetPossible())return runout();return nextStreet()}G.current=nextSeat(G.current,true);G.turnLeft=G.decision;render();privacy()}
 function dealBoard(n){G.deck.pop();for(let k=0;k<n;k++)G.board.push(G.deck.pop())}
-function nextStreet(){G.p.forEach(q=>q.bet=0);G.maxBet=0;G.lastFullRaise=G.bb;G.acted=new Set();G.fullSeq=0;G.lastActSeq=Array(G.n).fill(-1);G.lastFacing=Array(G.n).fill(null);
+function nextStreet(){G.p.forEach(q=>q.bet=0);G.maxBet=0;G.lastFullRaise=G.bb;G.acted=new Set();G.fullSeq=0;G.lastActSeq=Array(G.n).fill(-1);G.lastFacing=Array(G.n).fill(null);G.actionLabel=Array(G.n).fill(null);
  if(G.street==='PREFLOP'){dealBoard(3);G.street='FLOP'}else if(G.street==='FLOP'){dealBoard(1);G.street='TURN'}else if(G.street==='TURN'){dealBoard(1);G.street='RIVER'}else return showdown();
  if(noBetPossible())return runout();G.current=nextSeat(G.button,true);G.turnLeft=G.decision;G.log.push(G.street);render();privacy()
 }
-function runout(){while(G.board.length<5)dealBoard(G.board.length===0?3:1);showdown()}
+function revealStreetLabel(){
+ let n=G.revealCount!=null?G.revealCount:G.board.length;
+ return n<3?'PREFLOP':n===3?'FLOP':n===4?'TURN':'RIVER';
+}
+function computeEquitySnapshot(seatIdxs,board){
+ let contenders=seatIdxs.map(i=>({seat:i,hole:G.p[i].hole}));
+ let eq=calcEquity(contenders,board);
+ let map={};
+ eq.forEach(e=>map[e.seat]=e.pct);
+ return map;
+}
+function runout(){
+ let startCount=G.board.length;
+ G.pendingReveal=true; // finishHand() will hold the result banner until the reveal finishes
+ G.revealCount=startCount; // must be set before showdown() triggers finishHand's first render
+ // Snapshot who's actually still live for showdown BEFORE dealing the rest of the
+ // board, so their equity can be computed and shown at each reveal step - exactly
+ // what real broadcasts do for a dramatic all-in confrontation.
+ let contenders=G.p.map((q,i)=>({q,i})).filter(({q})=>!q.fold&&q.hole&&q.hole.length===2);
+ if(contenders.length>=2){
+   G.equityContenders=contenders.map(({i})=>i);
+   G.equityBySeat=computeEquitySnapshot(G.equityContenders,G.board.slice(0,startCount));
+ } else {
+   G.equityContenders=null;G.equityBySeat=null;
+ }
+ while(G.board.length<5)dealBoard(G.board.length===0?3:1);
+ showdown();
+ animateReveal();
+}
+function animateReveal(){
+ if(!G)return;
+ let targets=[3,4,5].filter(t=>t>G.revealCount);
+ if(!targets.length){
+   G.pendingReveal=false;
+   let pay=G.pendingRevealPay;G.pendingRevealPay=null;G.revealCount=null;
+   G.equityContenders=null;G.equityBySeat=null;
+   finalizeHandResult(pay);
+   return;
+ }
+ setTimeout(()=>{
+   if(!G)return;
+   G.revealCount=targets[0];
+   if(G.equityContenders)G.equityBySeat=computeEquitySnapshot(G.equityContenders,G.board.slice(0,G.revealCount));
+   render();
+   animateReveal();
+ },900);
+}
 function comb5(a){let o=[];for(let i=0;i<a.length-4;i++)for(let j=i+1;j<a.length-3;j++)for(let k=j+1;k<a.length-2;k++)for(let l=k+1;l<a.length-1;l++)for(let m=l+1;m<a.length;m++)o.push([a[i],a[j],a[k],a[l],a[m]]);return o}
 function rank5(cs){let rs=cs.map(c=>'23456789TJQKA'.indexOf(c[0])+2).sort((a,b)=>b-a),cnt={};rs.forEach(r=>cnt[r]=(cnt[r]||0)+1);let u=[...new Set(rs)].sort((a,b)=>b-a);if(u[0]===14)u.push(1);let st=0;for(let i=0;i<=u.length-5;i++)if(u[i]-u[i+4]===4){st=u[i];break}let fl=cs.every(c=>c[1]===cs[0][1]),g=Object.entries(cnt).map(([r,c])=>[+c,+r]).sort((a,b)=>b[0]-a[0]||b[1]-a[1]);if(fl&&st)return[8,st];if(g[0][0]===4)return[7,g[0][1],g[1][1]];if(g[0][0]===3&&g[1]?.[0]>=2)return[6,g[0][1],g[1][1]];if(fl)return[5,...rs];if(st)return[4,st];if(g[0][0]===3)return[3,g[0][1],...g.slice(1).map(x=>x[1]).sort((a,b)=>b-a).slice(0,2)];if(g[0][0]===2&&g[1]?.[0]===2){let ps=[g[0][1],g[1][1]].sort((a,b)=>b-a),k=g.filter(x=>x[0]===1).map(x=>x[1]).sort((a,b)=>b-a)[0]||0;return[2,...ps,k]}if(g[0][0]===2)return[1,g[0][1],...g.filter(x=>x[0]===1).map(x=>x[1]).sort((a,b)=>b-a).slice(0,3)];return[0,...rs.slice(0,5)]}
 function cmp(a,b){for(let i=0;i<Math.max(a.length,b.length);i++){let d=(a[i]||0)-(b[i]||0);if(d)return d}return 0}function best7(cs){let b=null;for(let c of comb5(cs)){let r=rank5(c);if(!b||cmp(r,b)>0)b=r}return b}
+function calcEquity(contenders,board){
+ // contenders: [{seat,hole:[c1,c2]}, ...]. Returns [{seat,pct}] win-equity per contender.
+ let used=new Set(board);
+ contenders.forEach(c=>c.hole.forEach(h=>used.add(h)));
+ let unseen=[];
+ for(let s of 'shdc')for(let r of '23456789TJQKA'){let c=r+s;if(!used.has(c))unseen.push(c)}
+ let need=5-board.length;
+ let wins=contenders.map(()=>0),total=0;
+ function evalBoard(fullBoard){
+   let best=null,bestIdx=[];
+   contenders.forEach((c,i)=>{
+     let r=best7([...c.hole,...fullBoard]);
+     if(!best||cmp(r,best)>0){best=r;bestIdx=[i]}
+     else if(cmp(r,best)===0)bestIdx.push(i);
+   });
+   total++;
+   bestIdx.forEach(i=>wins[i]+=1/bestIdx.length);
+ }
+ if(need<=0){
+   evalBoard([]);
+ } else if(need===1){
+   for(let i=0;i<unseen.length;i++)evalBoard([unseen[i]]);
+ } else if(need===2){
+   for(let i=0;i<unseen.length;i++)for(let j=i+1;j<unseen.length;j++)evalBoard([unseen[i],unseen[j]]);
+ } else {
+   let samples=800;
+   for(let k=0;k<samples;k++){let pool=[...unseen];sh(pool);evalBoard(pool.slice(0,need))}
+ }
+ return contenders.map((c,i)=>({seat:c.seat,pct:total?100*wins[i]/total:0}));
+}
 function showdown(){while(G.board.length<5)dealBoard(G.board.length===0?3:1);let levels=[...new Set(G.p.map(q=>q.total).filter(x=>x>0))].sort((a,b)=>a-b),prev=0,pay=Array(G.n).fill(0);
  for(let lev of levels){let contributors=G.p.map((q,i)=>({q,i})).filter(x=>x.q.total>=lev),amt=(lev-prev)*contributors.length,eligible=contributors.filter(x=>!x.q.fold),br=null,w=[];for(let x of eligible){let r=best7([...x.q.hole,...G.board]);if(!br||cmp(r,br)>0){br=r;w=[x.i]}else if(cmp(r,br)===0)w.push(x.i)}if(w.length){let each=Math.floor(amt/w.length),rem=amt-each*w.length;w.forEach((i,k)=>pay[i]+=each+(k===0?rem:0))}prev=lev}
  pay.forEach((x,i)=>G.p[i].stack+=x);G.log.push(pay.map((x,i)=>x?`${G.p[i].name} +${fmt(x)}`:null).filter(Boolean).join(' · '));finishHand(pay)}
@@ -952,13 +1091,15 @@ function finishHand(pay){
  history.push(JSON.parse(JSON.stringify({hand:G.hand,board:G.board,p:G.p,log:G.log,pay,button:G.button,n:G.n,sb:G.sb,bb:G.bb,bba:G.bba})));
  G.street='SHOWDOWN';G.current=null;G.pot=0;
  G.p.forEach(q=>{if(q.stack<=0)q.busted=true});
+ if(G.pendingReveal){G.pendingRevealPay=pay;render();return}
+ finalizeHandResult(pay);
+}
+function finalizeHandResult(pay){
  // Build a readable summary of who won and with what, shown while the table sits
  // on the finished hand - at 0.9s there was no time to read the board or the
  // opponent's cards before the next hand wiped it.
  let winners=pay.map((v,i)=>v>0?{i,v}:null).filter(Boolean);
- if(winners.length){
-   G.handResult=winners.map(w=>`${G.p[w.i].name} +${fmtChip(w.v)}`).join(' · ');
- } else G.handResult=null;
+ G.handResult=winners.length?winners.map(w=>`${G.p[w.i].name} +${fmtChip(w.v)}`).join(' · '):null;
  render();
  if(aliveIds().length<=1)return finishTournament(aliveIds()[0]);
  if(G.auto&&!G.paused)setTimeout(()=>{if(!G.paused&&!G.ended){G.handResult=null;G.button=nextSeat(G.button);newHand()}},HAND_REVIEW_MS);
@@ -967,25 +1108,62 @@ function finishTournament(i){G.ended=true;G.current=null;render();if(G.isSpot){s
 function privacy(){if(G.current==null||G.ended)return;revealSeat=null;if(remoteMode)return;if(G.botSeats&&G.botSeats.includes(G.current))return;$('privName').textContent=G.p[G.current].name;$('privacy').classList.add('open');beep()}
 function reveal(){revealSeat=G.current;$('privacy').classList.remove('open');render()}
 function togglePause(){G.paused=!G.paused;render()}function nextManual(){if(G.street==='SHOWDOWN'&&!G.ended){G.button=nextSeat(G.button);newHand()}}
-function tick(){if(!G||G.paused||G.ended||G.current==null||!G.decision)return;G.turnLeft--;if(G.turnLeft<=0){revealSeat=G.current;act('fold')}else render()}
+function tick(){
+ if(!G||G.paused||G.ended||G.current==null||!G.decision)return;
+ G.turnLeft--;
+ if(G.turnLeft<=0){
+   revealSeat=G.current;
+   let i=G.current,c=callAmt(i);
+   act(c>0?'fold':'call'); // real shot-clock convention: auto-check if free, dead hand (fold) if facing a bet
+ } else render();
+}
+function useTimeBank(){
+ if(!G||G.current==null)return;
+ let i=G.current;
+ if(!G.timeBankChips||!G.timeBankChips[i])return;
+ if(remoteMode&&mySeat!==i)return; // only the acting player may spend their own chip
+ if(remoteMode&&!isHost){submitTimeBankUse();return}
+ G.timeBankChips[i]--;
+ G.turnLeft+=30;
+ render();
+}
+async function submitTimeBankUse(){
+ if(!remoteMode||isHost)return;
+ try{
+   const item={seat:mySeat,type:'timebank',amount:0,id:Date.now()+'_'+Math.random()};
+   await fetch('/api/kv/append',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:`room_${myRoom}_queue`,item})});
+ }catch(e){}
+}
 let raiseDecisionKey=null, raiseCurrentVal=null;
-let handPotTrail=[], replayShowBB=false, potTrailByHand={}, liveShowBB=false;
+let handPotTrail=[], replayShowBB=true, potTrailByHand={}, liveShowBB=true;
 let playerStats={}, statsProcessedHands=0;
 function updateStatsFromHistory(){
  while(statsProcessedHands<history.length){
   let h=history[statsProcessedHands];
   let preflopActs={};
+  let raiseCount=0,threeBetOpp={},threeBetDone={};
   for(let line of h.log){
    if(line==='FLOP'||line==='TURN'||line==='RIVER')break;
    let m=line.match(/^(.+?) (calls|raises to|bets|checks|folds)/);
-   if(m){if(!preflopActs[m[1]])preflopActs[m[1]]=[];preflopActs[m[1]].push(m[2])}
+   if(!m)continue;
+   let name=m[1],type=m[2];
+   if(!preflopActs[name])preflopActs[name]=[];
+   preflopActs[name].push(type);
+   if(type==='raises to'||type==='bets'){
+    if(raiseCount===1)threeBetDone[name]=true;
+    raiseCount++;
+   } else if(raiseCount===1&&!(name in threeBetOpp)){
+    threeBetOpp[name]=true; // had a real decision while facing exactly one raise
+   }
   }
   h.p.forEach((p,i)=>{
-   if(!playerStats[i])playerStats[i]={hands:0,vpip:0,pfr:0};
+   if(!playerStats[i])playerStats[i]={hands:0,vpip:0,pfr:0,threeBetOpp:0,threeBet:0};
    playerStats[i].hands++;
    let acts=preflopActs[p.name]||[];
    if(acts.some(t=>t==='calls'||t==='raises to'||t==='bets'))playerStats[i].vpip++;
    if(acts.some(t=>t==='raises to'||t==='bets'))playerStats[i].pfr++;
+   if(threeBetOpp[p.name]||threeBetDone[p.name])playerStats[i].threeBetOpp++;
+   if(threeBetDone[p.name])playerStats[i].threeBet++;
   });
   statsProcessedHands++;
  }
@@ -1375,7 +1553,16 @@ function ensureAudio(){if(!actx)actx=new (window.AudioContext||window.webkitAudi
 function beep(){try{if(!soundOn)return;ensureAudio();let o=actx.createOscillator(),g=actx.createGain();o.type='sine';o.frequency.value=660;g.gain.value=.0001;o.connect(g);g.connect(actx.destination);let t=actx.currentTime;g.gain.exponentialRampToValueAtTime(.05,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+.18);o.start(t);o.stop(t+.2)}catch(e){}}
 
 /* ---- chips + cards ---- */
-function chipIcon(amt){return amt?'<span class="chip"></span>':''}
+function chipTier(amt){
+ if(!G||!G.bb)return'mid';
+ let bb=amt/G.bb;
+ if(bb<3)return'low';
+ if(bb<10)return'mid';
+ if(bb<30)return'high';
+ if(bb<80)return'huge';
+ return'massive';
+}
+function chipIcon(amt){return amt?`<span class="chip chip-${chipTier(amt)}"></span>`:''}
 function card(c,show){if(!show)return'<div class="card back"></div>';let r=c[0],s=c[1];return`<div class="card suit-${s}"><span class="rank">${r}</span><span class="suiticon">${SU[s]}</span></div>`}
 function ringMarkup(left,total){let pct=Math.max(0,Math.min(1,left/total)),r=27,c=2*Math.PI*r,off=c*(1-pct);return`<div class="ring"><svg viewBox="0 0 64 64"><circle class="ring-bg" cx="32" cy="32" r="${r}"></circle><circle class="ring-fg" cx="32" cy="32" r="${r}" style="stroke-dasharray:${c};stroke-dashoffset:${off}"></circle></svg><span class="ring-num">${left}</span></div>`}
 function potTotalDisplay(){if(G.street==='SHOWDOWN')return G.p.reduce((a,q)=>a+(q.total||0),0);return G.pot}
@@ -1383,8 +1570,44 @@ function potBreakdown(){if(!G||G.street!=='SHOWDOWN')return'';let levels=[...new
 
 /* ---- history review ---- */
 function openHistory(){renderHistoryList();$('historyModal').classList.add('open')}
+const HAND_CAT_NAMES_HE=['קלף גבוה','זוג','שני זוגות','שלישייה','סטרייט','פלאש','פול האוס','פוקר','סטרייט פלאש'];
+const RANK_NAME_HE={14:'אסים',13:'מלכים',12:'מלכות',11:"ג'קים",10:'עשרות',9:'תשיעיות',8:'שמיניות',7:'שביעיות',6:'שישיות',5:'חמישיות',4:'רביעיות',3:'שלישיות',2:'שתיים'};
+const RANK_NAME_SG_HE={14:'אס',13:'מלך',12:'מלכה',11:"ג'ק",10:'עשר',9:'תשע',8:'שמונה',7:'שבע',6:'שש',5:'חמש',4:'ארבע',3:'שלוש',2:'שתיים'};
+function describeHandCategory(r){
+ let cat=r[0];
+ if(cat===1)return`זוג ${RANK_NAME_HE[r[1]]}`;
+ if(cat===2)return`שני זוגות, ${RANK_NAME_HE[r[1]]} ו${RANK_NAME_HE[r[2]]}`;
+ if(cat===3)return`שלישיית ${RANK_NAME_HE[r[1]]}`;
+ if(cat===4)return`סטרייט עד ה${RANK_NAME_SG_HE[r[1]]}`;
+ if(cat===5)return'פלאש';
+ if(cat===6)return`פול האוס, ${RANK_NAME_HE[r[1]]} על ${RANK_NAME_HE[r[2]]}`;
+ if(cat===7)return`פוקר ${RANK_NAME_HE[r[1]]}`;
+ if(cat===8)return`סטרייט פלאש עד ה${RANK_NAME_SG_HE[r[1]]}`;
+ return`${RANK_NAME_SG_HE[r[1]]} גבוה`;
+}
+function handHeadline(h){
+ let foldedNames=new Set(h.log.filter(l=>/ folds$/.test(l)).map(l=>l.replace(/ folds$/,'')));
+ let contenders=h.p.filter(p=>p.hole&&p.hole.length===2&&!foldedNames.has(p.name));
+ let hadAllin=h.log.some(l=>/all-in/i.test(l));
+ if(contenders.length<2)return hadAllin?'זכייה באול-אין ללא הכרעה':'זכייה ללא קרב (כולם קיפלו)';
+ if(hadAllin)return'שואודאון עם אול-אין';
+ return'הגעה לשואודאון';
+}
 function renderHistoryList(){
- let rows=history.length?[...history].reverse().map(h=>{let winners=h.p.map((p,i)=>h.pay[i]?p.name:null).filter(Boolean).join(', ')||'—';return`<div class="histrow"><div><b>יד #${h.hand}</b><span class="muted"> · פוט ${fmt(h.pay.reduce((a,x)=>a+x,0))}</span><div class="muted" style="font-size:12px">זוכה: ${winners}</div></div><button class="btn ghost" onclick="showHand(${h.hand})">צפייה</button></div>`}).join(''):'<p class="muted" style="font-size:12.5px">אין עדיין ידיים שהושלמו בסשן הנוכחי.</p>';
+ let rows=history.length?[...history].reverse().map(h=>{
+   let total=h.pay.reduce((a,x)=>a+x,0);
+   let winners=h.p.map((p,i)=>h.pay[i]>0?{p,i,amt:h.pay[i]}:null).filter(Boolean);
+   let topWinner=winners.sort((a,b)=>b.amt-a.amt)[0];
+   let winnerCards=topWinner&&topWinner.p.hole&&topWinner.p.hole.length===2?topWinner.p.hole.map(c=>card(c,true)).join(''):'';
+   let winnerNames=winners.map(w=>w.p.name).join(', ')||'—';
+   return`<div class="histrow" onclick="showHand(${h.hand})">
+     <div class="histrow-main">
+       <div class="histrow-top"><b>יד #${h.hand}</b><span class="histrow-headline">${handHeadline(h)}</span></div>
+       <div class="histrow-bottom"><span class="histrow-winner">🏆 ${winnerNames}</span><span class="histrow-cards">${winnerCards}</span></div>
+     </div>
+     <div class="histrow-side"><div class="histrow-pot">${fmt(total)}</div><div class="histrow-pot-label">קופה</div></div>
+   </div>`;
+ }).join(''):'<p class="muted" style="font-size:12.5px">אין עדיין ידיים שהושלמו בסשן הנוכחי.</p>';
  $('historyBox').innerHTML=`<h2>סקירת ידיים</h2>${rows}
   <button class="btn ghost wide" style="margin-top:12px" onclick="closeModal('historyModal')">סגור</button>`;
 }
@@ -1639,9 +1862,16 @@ function renderReplayTable(h,stepIdx){
    let betAmt=seatState.bets[p.name];
    let betHtml=betAmt?`<div class="bet"><span class="betline ${isAllin?'allin-bet':''}">${chipIcon(betAmt)}${fmtUnit(betAmt,h.bb)}${isAllin?' ALL-IN':''}</span></div>`:'';
    let foldTag=isFolded?'<div class="fold-stamp">FOLD</div>':'';
-   return`<div class="seat replay-seat ${won?'winner':''}" style="${ps};opacity:${isFolded?.4:1}"><div class="cards">${cardsHtml}</div><div class="avatar" style="background:${AVATAR_COLORS[i%AVATAR_COLORS.length]}">${(p.name||'?').charAt(0).toUpperCase()}</div><div class="nameplate"><div class="name">${p.name}${tags}</div>${won?`<div class="win-amt">+${fmtUnit(h.pay[i],h.bb)}</div>`:''}</div>${betHtml}${foldTag}</div>`;
+   return`<div class="seat replay-seat ${won?'winner':''}" style="${ps};opacity:${isFolded?.4:1}"><div class="cards">${cardsHtml}</div><div class="avatar" style="background:${avatarBg(AVATAR_COLORS[i%AVATAR_COLORS.length])}">${(p.name||'?').charAt(0).toUpperCase()}</div><div class="nameplate"><div class="name">${p.name}${tags}</div>${won?`<div class="win-amt">+${fmtUnit(h.pay[i],h.bb)}</div>`:''}</div>${betHtml}${foldTag}</div>`;
  }).join('');
  return`<div class="replay-tablewrap"><div class="replay-rail"><div class="replay-table"><div class="board">${h.board.slice(0,boardCount).map(c=>card(c,true)).join('')}</div><div class="replay-pot">${chipIcon(potNow)}${fmtUnit(potNow,h.bb)}</div>${seats}</div></div></div>`;
+}
+function classifyLogLine(line){
+ if(/ folds$/.test(line))return'ln-fold';
+ if(/all-in/i.test(line))return'ln-allin';
+ if(/ raises to | bets /.test(line))return'ln-raise';
+ if(/ calls | checks$/.test(line))return'ln-neutral';
+ return'';
 }
 function renderStreetColumns(h,currentIdx){
  let sec=groupLogByStreet(h.log);
@@ -1652,7 +1882,7 @@ function renderStreetColumns(h,currentIdx){
  if(!cols.length)return'<p class="muted" style="font-size:12.5px">אין נתוני פעולות עבור היד הזו.</p>';
  return`<div class="street-grid">${cols.map(k=>{
    let pot=potAtEndOfSection(h,sec[k]);
-   return`<div class="street-col"><div class="street-head"><div class="street-head-top"><span>${labels[k]}</span>${pot!=null?`<span class="street-pot">קופה: ${fmtUnit(pot,h.bb)}</span>`:''}</div>${boardAt[k].length?`<div class="street-board">${boardAt[k].map(c=>card(c,true)).join('')}</div>`:''}</div>${sec[k].map(x=>`<div class="street-line ${currentIdx!=null&&x.idx===currentIdx?'now-playing':''}" id="${currentIdx!=null&&x.idx===currentIdx?'replayNowPlaying':''}">${currentIdx!=null&&x.idx===currentIdx?'▶ ':''}${convertLineToBB(x.line,h.bb)}</div>`).join('')||'<div class="street-line muted">—</div>'}</div>`;
+   return`<div class="street-col"><div class="street-head"><div class="street-head-top"><span>${labels[k]}</span>${pot!=null?`<span class="street-pot">קופה: ${fmtUnit(pot,h.bb)}</span>`:''}</div>${boardAt[k].length?`<div class="street-board">${boardAt[k].map(c=>card(c,true)).join('')}</div>`:''}</div>${sec[k].map(x=>`<div class="street-line ${classifyLogLine(x.line)} ${currentIdx!=null&&x.idx===currentIdx?'now-playing':''}" id="${currentIdx!=null&&x.idx===currentIdx?'replayNowPlaying':''}">${currentIdx!=null&&x.idx===currentIdx?'▶ ':''}${convertLineToBB(x.line,h.bb)}</div>`).join('')||'<div class="street-line muted">—</div>'}</div>`;
  }).join('')}</div>`;
 }
 let replayEverStepped=false;
@@ -1682,6 +1912,18 @@ function togglePlay(handNo){
  showHand(handNo);
 }
 let replayHandShown=null;
+function renderShowdownReveal(h){
+ let foldedNames=new Set(h.log.filter(l=>/ folds$/.test(l)).map(l=>l.replace(/ folds$/,'')));
+ let contenders=h.p.map((p,i)=>({p,i})).filter(({p})=>p.hole&&p.hole.length===2&&!foldedNames.has(p.name));
+ if(contenders.length<2)return''; // uncontested pot - nothing to compare, the payout line already says who won
+ let boardFull=h.board&&h.board.length===5;
+ let rows=contenders.map(({p,i})=>{
+   let desc=boardFull?describeHandCategory(best7([...p.hole,...h.board])):'';
+   let won=h.pay&&h.pay[i]>0;
+   return`<div class="showdown-row ${won?'won':''}">${won?'<span class="showdown-trophy">🏆</span>':''}<span class="showdown-name">${p.name}</span><span class="showdown-cards">${p.hole.map(c=>card(c,true)).join('')}</span><span class="showdown-desc">${desc}</span>${won?`<span class="showdown-amt">+${fmtUnit(h.pay[i],h.bb)}</span>`:''}</div>`;
+ }).join('');
+ return`<div class="showdown-reveal"><div class="dl-title" style="margin-top:0">שואודאון — מי הראה מה</div>${rows}</div>`;
+}
 function showHand(handNo){
  let h=history.find(x=>x.hand===handNo);if(!h)return;
  if(replayHandShown!==handNo){replayHandShown=handNo;replayStepIdx=-1;replayPlaying=false;replayEverStepped=false;clearInterval(replayPlayTimer)}
@@ -1699,6 +1941,7 @@ function showHand(handNo){
    <div class="libnote" style="margin:6px 0 2px">לחצו ▶ כדי לצפות ביד מתקדמת שלב-שלב על גבי השולחן. הרישום המלא למטה תמיד גלוי — השורה המסומנת מראה איפה נמצאים.</div>
    ${renderReplayTable(h,replayEverStepped?replayStepIdx:undefined)}
    ${stepControls}
+   ${renderShowdownReveal(h)}
    <div class="dl-title" style="margin-top:16px">מהלך היד לפי רחוב (רישום מלא)</div>
    ${renderStreetColumns(h,activeIdx)}
    <div style="display:flex;gap:8px;margin-top:16px"><button class="btn ghost" onclick="clearInterval(replayPlayTimer);replayPlaying=false;renderHistoryList()">חזרה לרשימה</button><button class="btn ghost" onclick="clearInterval(replayPlayTimer);replayPlaying=false;closeModal('historyModal')">סגור</button></div>`;
@@ -1708,6 +1951,7 @@ function showHand(handNo){
 function closeModal(id){clearInterval(replayPlayTimer);replayPlaying=false;$(id).classList.remove('open')}
 
 /* ---- render ---- */
+function avatarBg(hex){return`radial-gradient(circle at 32% 26%,rgba(255,255,255,.4),rgba(255,255,255,0) 42%),${hex}`}
 const AVATAR_COLORS=['#3d8fd9','#d9483d','#3fa868','#a259d9','#e0954f','#3fb0c9','#d9508f','#8ab63f'];
 // How long the finished hand stays on screen before the next one is dealt.
 // Coach-adjustable from the lobby; the old 900ms was far too fast to read the
@@ -1718,11 +1962,42 @@ function render(){
    _renderImpl();
    let ab0=document.getElementById('actionbar');
    if(ab0&&ab0.dataset.errShown)delete ab0.dataset.errShown;
+   correctLandscapeOverlap();
  }
  catch(e){
    console.error('render() failed:',e&&e.message,e&&e.stack);
    let ab=document.getElementById('actionbar');
    if(ab&&!ab.dataset.errShown){ab.dataset.errShown='1';toast('קרתה תקלה בעדכון המסך — נסו ללחוץ שוב או לרענן')}
+ }
+}
+function seatsOverlapOrOverflow(seats,topLimit,botLimit){
+ let rects=seats.map(s=>s.getBoundingClientRect());
+ if(rects.some(r=>r.top<topLimit-2||r.bottom>botLimit+2))return true;
+ for(let i=0;i<rects.length;i++)for(let j=i+1;j<rects.length;j++){
+   const a=rects[i],b=rects[j];
+   const ox=Math.max(0,Math.min(a.right,b.right)-Math.max(a.left,b.left));
+   const oy=Math.max(0,Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top));
+   if(ox>5&&oy>5)return true;
+ }
+ return false;
+}
+function correctLandscapeOverlap(){
+ // Shrinks the seat cards themselves (not the felt) step by step until they
+ // genuinely fit, verified against the real rendered DOM rather than a fixed
+ // overhang constant tuned to a handful of devices - which kept failing on
+ // shorter phones because seat card size never actually changed with them.
+ document.body.classList.remove('lscale-1','lscale-2','lscale-3','lscale-4');
+ if(!isLandscapePhone())return;
+ let top=document.querySelector('.top');
+ let ab=document.querySelector('.actionbar');
+ let seats=Array.from(document.querySelectorAll('.seat'));
+ if(!top||!ab||seats.length<2)return;
+ const topLimit=top.getBoundingClientRect().bottom;
+ const botLimit=ab.getBoundingClientRect().top;
+ if(!seatsOverlapOrOverflow(seats,topLimit,botLimit))return;
+ for(const tier of['lscale-1','lscale-2','lscale-3','lscale-4']){
+   document.body.classList.add(tier);
+   if(!seatsOverlapOrOverflow(seats,topLimit,botLimit))return;
  }
 }
 window.addEventListener('error',function(ev){
@@ -1762,12 +2037,16 @@ function _renderImpl(){if(!G)return;let m=MODES[G.mode]||[G.spotTitle||'תרגי
    let tags='';if(i===G.button)tags+='<span class="tag dealer">D</span>';if(i===sb)tags+='<span class="tag blind">SB</span>';if(i===bb)tags+='<span class="tag blind">BB</span>';
    let bounty=G.bountyOn?`<span class="tag bounty" title="באונטי על הראש של ${q.name}">🎯$${G.bounty[i]||0}</span>${G.bountiesWon[i]?`<span class="tag bounty-won" title="באונטי שנאסף">+$${G.bountiesWon[i]}</span>`:''}`:'';
    let bet=q.bet?`<span class="betline">${chipIcon(q.bet)}${fmtChip(q.bet)}</span>`:'';
+   let actLabel=G.actionLabel&&G.actionLabel[i];
+   let actBadge=actLabel?`<div class="action-badge ${actLabel==='FOLD'?'act-fold':actLabel==='ALL-IN'?'act-allin':(actLabel==='RAISE'||actLabel==='BET')?'act-raise':'act-neutral'}">${actLabel}</div>`:'';
    let cardsHtml=q.hole.map(c=>{let html=card(c,show);if(justRevealed)html=html.replace('class="card','class="card flip-anim');return html}).join('');
+   let equityPct=G.equityBySeat&&G.equityBySeat[i]!=null?G.equityBySeat[i]:null;
+   let equityBadge=equityPct!=null?`<div class="equity-badge ${equityPct>=50?'leading':''}">${equityPct.toFixed(1)}%</div>`:'';
    let initial=(q.name||'?').trim().charAt(0).toUpperCase();
    let stackDisplay=liveShowBB?`${(q.stack/G.bb).toFixed(1)} BB`:fmt(q.stack);
-   let st=playerStats[i]||{hands:0,vpip:0,pfr:0},vpipPct=st.hands?Math.round(100*st.vpip/st.hands):0,pfrPct=st.hands?Math.round(100*st.pfr/st.hands):0;
-   let hudLine=`<div class="hudstat ${st.hands<3?'dim':''}" title="VPIP/PFR מתוך ${st.hands} ידיים בסשן זה">${vpipPct}/${pfrPct} <span style="opacity:.7">(${st.hands})</span></div>`;
-   return`<div class="seat ${turn?'turn':''}" style="left:${pos[0]}%;top:${pos[1]}%;opacity:${q.fold?.45:q.stack<=0?.3:1}"><div class="cards">${cardsHtml}</div>${turn&&G.decision?`<div class="turnclock ${G.turnLeft<=5?'urgent':''}">${G.turnLeft}</div>`:''}<div class="avatar" style="background:${AVATAR_COLORS[i%AVATAR_COLORS.length]};border-color:${AVATAR_COLORS[i%AVATAR_COLORS.length]}66">${initial}<span class="seatnum">${i+1}</span></div><div class="nameplate" onclick="toggleLiveUnit()" title="לחיצה מחליפה תצוגת ערימה בין צ'יפים ל-BB" style="cursor:pointer"><div class="name">${q.name}${tags}${bounty}</div><div class="chips">${stackDisplay}</div>${hudLine}</div><div class="bet">${bet}</div></div>`
+   let st=playerStats[i]||{hands:0,vpip:0,pfr:0,threeBetOpp:0,threeBet:0},vpipPct=st.hands?Math.round(100*st.vpip/st.hands):0,pfrPct=st.hands?Math.round(100*st.pfr/st.hands):0,threeBetPct=st.threeBetOpp?Math.round(100*st.threeBet/st.threeBetOpp):0;
+   let hudLine=`<div class="hudstat ${st.hands<3?'dim':''}" title="VPIP/PFR/3-Bet מתוך ${st.hands} ידיים בסשן זה">${vpipPct}/${pfrPct}/${threeBetPct} <span style="opacity:.7">(${st.hands})</span></div>`;
+   return`<div class="seat ${turn?'turn':''}" style="left:${pos[0]}%;top:${pos[1]}%;opacity:${q.fold?.45:q.busted?.3:1}"><div class="cards">${cardsHtml}</div>${equityBadge}${turn&&G.decision?`<div class="turnclock ${G.turnLeft<=5?'urgent':''}">${G.turnLeft}</div>`:''}${G.timeBankChips&&G.timeBankChips[i]>0?`<div class="timebank-count" title="בנק זמן שנותר">⏱${G.timeBankChips[i]}</div>`:''}<div class="avatar" style="background:${avatarBg(AVATAR_COLORS[i%AVATAR_COLORS.length])};border-color:${AVATAR_COLORS[i%AVATAR_COLORS.length]}66">${initial}<span class="seatnum">${i+1}</span></div><div class="nameplate" onclick="toggleLiveUnit()" title="לחיצה מחליפה תצוגת ערימה בין צ'יפים ל-BB" style="cursor:pointer"><div class="name">${q.name}${tags}${bounty}</div><div class="chips">${stackDisplay}</div>${hudLine}</div>${turn&&G.decision?`<div class="decision-bar"><div class="decision-bar-fill ${G.turnLeft<=5?'urgent':''}" style="width:${Math.max(0,Math.min(100,100*G.turnLeft/G.decision))}%"></div></div>`:''}${actBadge}<div class="bet">${bet}</div></div>`
  }).join('');
  let pb=potBreakdown();
  let isMobile=isCompactLayout();
@@ -1777,9 +2056,14 @@ function _renderImpl(){if(!G)return;let m=MODES[G.mode]||[G.spotTitle||'תרגי
    ${(G.bba&&!isMobile)?`<div class="row"><span>Ante</span><b>${fmt(G.bba)}</b></div>`:''}
    <div class="row"><span>Street</span><b>${G.street}</b></div>
    ${isMobile?'':`<div class="row"><span>שחקנים</span><b>${alive}</b></div>`}`;
- $('table').innerHTML=`<div class="board">${G.board.map(c=>card(c,true)).join('')}</div><div class="potwrap"><div class="potlabel">TOTAL POT</div><div class="potamt">${chipIcon(potTotalDisplay())}${fmtChip(potTotalDisplay())}</div>${pb?`<div class="potbreak">${pb}</div>`:''}</div><div class="streetlabel">${G.street}</div>${G.handResult?`<div class="handresult">🏆 ${G.handResult}</div>`:''}${seats}`;
+ let visibleBoard=(G.revealCount!=null&&G.revealCount<G.board.length)?G.board.slice(0,G.revealCount):G.board;
+ $('table').innerHTML=`<div class="board">${visibleBoard.map(c=>card(c,true)).join('')}</div><div class="potwrap"><div class="potlabel">TOTAL POT</div><div class="potamt">${chipIcon(potTotalDisplay())}${fmtChip(potTotalDisplay())}</div>${pb?`<div class="potbreak">${pb}</div>`:''}</div><div class="streetlabel">${G.pendingReveal?revealStreetLabel():G.street}</div>${G.handResult?`<div class="handresult">🏆 ${G.handResult}</div>`:''}${seats}`;
  maybeBotAct();
  let i=G.current,q=i!=null?G.p[i]:null,mine=remoteMode?(i!=null&&mySeat===i&&!G.paused&&!G.ended&&!actionPending):(i!=null&&revealSeat===i&&!G.paused&&!G.ended),c=q?callAmt(i):0,min=q?Math.min(minRaiseTo(),q.bet+q.stack):0,max=q?q.bet+q.stack:0,ql=G.street==='PREFLOP'?['min','2','2.2','2.5','3']:['min','33','50','75','pot'];
+ if(remoteMode){
+   if(lastPreActionHand!==G.hand){preActionType=null;lastPreActionHand=G.hand}
+   firePreActionIfDue(mine);
+ }
  let decisionKey=i+'_'+G.street+'_'+G.hand;
  if(decisionKey!==raiseDecisionKey){raiseDecisionKey=decisionKey;raiseCurrentVal=null;lastPresetClicked=null}
  let raiseVal=raiseCurrentVal!=null?Math.max(min,Math.min(max,raiseCurrentVal)):min;
@@ -1787,11 +2071,68 @@ function _renderImpl(){if(!G)return;let m=MODES[G.mode]||[G.spotTitle||'תרגי
  let dispVal=liveShowBB?(raiseVal/G.bb).toFixed(1):raiseVal;
  let dispMin=liveShowBB?(min/G.bb).toFixed(1):min;
  let dispMax=liveShowBB?(max/G.bb).toFixed(1):max;
- $('actionbar').innerHTML=`<div class="quick">${ql.map(x=>`<button class="btn ghost ${lastPresetClicked===x?'active':''}" ${!mine?'disabled':''} onclick="preset('${x}')">${x==='min'?'מינימום':x==='pot'?'פוט':G.street==='PREFLOP'?x+'x':x+'%'}</button>`).join('')}</div>${actionPending?'<div class="sending-indicator">שולח פעולה…</div>':''}<div class="actions"><button class="btn red" ${!mine?'disabled':''} onclick="submitAction('fold')">FOLD</button><button class="btn green" ${!mine?'disabled':''} onclick="submitAction('call')">${c?c>=q.stack?'CALL ALL-IN '+fmtChip(q.stack):'CALL '+fmtChip(c):'CHECK'}</button><div><div class="raisebox" onwheel="wheelAdjustRaise(event)"><input id="raiseRange" type="range" min="${dispMin}" max="${dispMax}" step="${bbStep}" value="${dispVal}" ${!mine?'disabled':''} oninput="onRaiseInput(this)"><input id="raiseTo" type="number" min="${dispMin}" max="${dispMax}" step="${bbStep}" value="${dispVal}" ${!mine?'disabled':''} oninput="onRaiseInput(this)" onwheel="wheelAdjustRaise(event)"></div>${mine?`<div class="wheel-hint">גלגלו עם העכבר כדי לשנות מהר · לחיצה על אחוז מעדכנת את הסכום למעלה${liveShowBB?' · מוצג ב-BB':''}</div>`:''}</div><button class="btn" ${!mine||!canRaise(i)?'disabled':''} onclick="submitAction('raise',raiseCurrentVal!=null?raiseCurrentVal:min)">${G.maxBet?'RAISE':'BET'}</button><button class="btn gold" ${!mine?'disabled':''} onclick="submitAction('jam')">ALL-IN</button>${G.street==='SHOWDOWN'&&!G.auto?`<button class="btn gold" onclick="nextManual()">${G.isSpot?'סיכום התרגיל':'יד הבאה'}</button>`:''}</div>`
+ let myOwnQ=remoteMode&&mySeat!=null?G.p[mySeat]:null;
+ let showPreAction=remoteMode&&!mine&&myOwnQ&&!myOwnQ.fold&&!myOwnQ.busted&&myOwnQ.hole&&myOwnQ.hole.length===2&&G.current!=null&&!G.ended;
+ let preActionHtml=showPreAction?`<div class="preaction-row"><button class="preaction-chip ${preActionType==='fold'?'active':''}" onclick="setPreAction('fold')"><span class="preaction-box">${preActionType==='fold'?'✓':''}</span> Fold</button><button class="preaction-chip ${preActionType==='checkfold'?'active':''}" onclick="setPreAction('checkfold')"><span class="preaction-box">${preActionType==='checkfold'?'✓':''}</span> Check/Fold</button></div>`:'';
+ $('actionbar').innerHTML=`${preActionHtml}<div class="quick">${ql.map(x=>`<button class="btn ghost ${lastPresetClicked===x?'active':''}" ${!mine?'disabled':''} onclick="preset('${x}')">${x==='min'?'מינימום':x==='pot'?'פוט':G.street==='PREFLOP'?x+'x':x+'%'}</button>`).join('')}</div>${actionPending?'<div class="sending-indicator">שולח פעולה…</div>':''}<div class="actions">${mine&&G.decision&&G.timeBankChips&&G.timeBankChips[i]>0?`<button class="btn timebank" onclick="useTimeBank()">⏱ בנק זמן +30 (${G.timeBankChips[i]})</button>`:''}<button class="btn red" ${!mine?'disabled':''} onclick="submitAction('fold')">FOLD</button><button class="btn green" ${!mine?'disabled':''} onclick="submitAction('call')">${c?c>=q.stack?'CALL ALL-IN '+fmtChip(q.stack):'CALL '+fmtChip(c):'CHECK'}</button><div><div class="raisebox" onwheel="wheelAdjustRaise(event)"><input id="raiseRange" type="range" min="${dispMin}" max="${dispMax}" step="${bbStep}" value="${dispVal}" ${!mine?'disabled':''} oninput="onRaiseInput(this)"><input id="raiseTo" type="number" min="${dispMin}" max="${dispMax}" step="${bbStep}" value="${dispVal}" ${!mine?'disabled':''} oninput="onRaiseInput(this)" onwheel="wheelAdjustRaise(event)"></div>${mine?`<div class="wheel-hint">גלגלו עם העכבר כדי לשנות מהר · לחיצה על אחוז מעדכנת את הסכום למעלה${liveShowBB?' · מוצג ב-BB':''}</div>`:''}</div><button class="btn" ${!mine||!canRaise(i)?'disabled':''} onclick="submitAction('raise',raiseCurrentVal!=null?raiseCurrentVal:min)">${G.maxBet?'RAISE':'BET'}</button><button class="btn gold" ${!mine?'disabled':''} onclick="submitAction('jam')">ALL-IN</button>${G.street==='SHOWDOWN'&&!G.auto?`<button class="btn gold" onclick="nextManual()">${G.isSpot?'סיכום התרגיל':'יד הבאה'}</button>`:''}</div>`
 }
 
 /* ================= REMOTE PLAY (shared storage sync) ================= */
 let remoteMode=false, myRoom=null, mySeat=null, myName='', isHost=false;
+const SESSION_KEY='outplay_remote_session';
+function saveSessionLocal(){
+ try{localStorage.setItem(SESSION_KEY,JSON.stringify({myRoom,mySeat,myName,isHost}))}catch(e){}
+}
+function clearSessionLocal(){
+ try{localStorage.removeItem(SESSION_KEY)}catch(e){}
+}
+async function tryResumeSession(){
+ let saved;
+ try{let raw=localStorage.getItem(SESSION_KEY);if(!raw)return false;saved=JSON.parse(raw)}catch(e){return false}
+ if(!saved||!saved.myRoom)return false;
+ let metaRaw=await storeGet(`room_${saved.myRoom}_meta`,true);
+ if(!metaRaw){clearSessionLocal();return false}
+ let meta;
+ try{meta=JSON.parse(metaRaw)}catch(e){clearSessionLocal();return false}
+ if(meta.ended){clearSessionLocal();return false}
+ // Confirm this seat still actually belongs to us (the room wasn't reset/reused).
+ if(meta.seats[saved.mySeat]!==saved.myName){clearSessionLocal();return false}
+ myRoom=saved.myRoom;mySeat=saved.mySeat;myName=saved.myName;isHost=saved.isHost;remoteMode=true;
+ switchTab('remote');
+ if(!meta.started){
+  enterWaitingRoom();
+  return true;
+ }
+ let stateRaw=await storeGet(`room_${myRoom}_state`,true);
+ if(!stateRaw){clearSessionLocal();remoteMode=false;myRoom=null;mySeat=null;isHost=false;return false}
+ let pub;
+ try{pub=JSON.parse(stateRaw)}catch(e){return false}
+ pub.acted=new Set(pub.acted||[]);pub.remoteMode=true;
+ if(isHost){
+  // We hold the only copy of the real deck, and it's gone with the closed tab.
+  // Rebuild a fresh, shuffled deck excluding every card already visible on the
+  // table (hole cards + board), so continuing to deal can never produce a
+  // duplicate card - the hand plays on legally, just with a freshly-randomized
+  // unseen portion of the deck rather than the exact original one.
+  let used=new Set(pub.board||[]);
+  (pub.p||[]).forEach(q=>{(q.hole||[]).forEach(c=>used.add(c))});
+  let full=deck();
+  pub.deck=full.filter(c=>!used.has(c));
+  history=(pub.__history)||history;
+  delete pub.__history;
+  G=pub;
+  clearInterval(timer);timer=setInterval(tick,1000);
+  clearInterval(levelTimer);if(G.levelMinutes>0)levelTimer=setInterval(levelTick,1000);
+  clearInterval(hostLoopTimer);hostLoopTimer=setInterval(hostLoop,500);
+ } else {
+  delete pub.__history;
+  G=pub;
+ }
+ enterRemoteTable(meta);
+ render();
+ toast('חוזרים למשחק שהיה פעיל…');
+ return true;
+}
 let waitPollTimer=null, hostLoopTimer=null, clientPollTimer=null;
 
 function roomCodeGen(){let chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',c='';for(let i=0;i<5;i++)c+=chars[Math.floor(Math.random()*chars.length)];return c}
@@ -1800,8 +2141,14 @@ async function storeGet(key,shared){try{let res=await fetch('/api/kv/get?key='+e
 async function storeSet(key,value,shared){try{let res=await fetch('/api/kv/set',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key,value})});if(!res.ok)throw new Error('HTTP '+res.status);let data=await res.json();if(!data.ok)throw new Error(data.error||'server error');return true}catch(e){lastStorageError=(e&&e.message)||String(e);console.error('[storage.set failed]',key,e);return false}}
 
 function initRemoteTab(){
- if($('rMode').options.length){runStorageDiag();return} // already populated
+ // Always refresh the options and selection to match the currently chosen stakes
+ // (`sel`), only skipping the network storage diagnostic if we've already run it
+ // this visit. The old code populated this dropdown once and then froze it,
+ // so picking different stakes elsewhere left this select silently stuck on
+ // whatever was selected the very first time this tab was opened.
+ let alreadyChecked=$('rMode').options.length>0;
  $('rMode').innerHTML=Object.entries(MODES).map(([k,v])=>`<option value="${k}" ${k===sel?'selected':''}>${v[0]} — ${fmt(v[1])}/${fmt(v[2])}</option>`).join('');
+ if(alreadyChecked)return;
  runStorageDiag();
 }
 async function runStorageDiag(){
@@ -1827,11 +2174,11 @@ async function createRoom(){
  let hostName=$('rHostName').value.trim()||'COACH';
  let seats=Array.from({length:n},()=>null);
  seats[0]=hostName;
- let meta={n,modeKey,sb:m[1],bb:m[2],bba:+$('rAnte').value?m[2]:0,levelMinutes:+$('rLevelMin').value,seats,started:false,ended:false,createdAt:Date.now()};
+ let meta={n,modeKey,sb:m[1],bb:m[2],bba:+$('rAnte').value?m[2]:0,levelMinutes:+$('rLevelMin').value,clock:+$('rClock').value,timeBankChips:+$('rTimeBankChips').value,seats,started:false,ended:false,createdAt:Date.now()};
  let ok=await storeSet(`room_${code}_meta`,JSON.stringify(meta),true);
  if(!ok){toast('שגיאת אחסון: '+(lastStorageError||'לא ידוע'));console.error('createRoom failed, lastStorageError=',lastStorageError);return}
  await storeSet(`room_${code}_queue`,JSON.stringify([]),true);
- myRoom=code;mySeat=0;myName=hostName;isHost=true;remoteMode=true;
+ myRoom=code;mySeat=0;myName=hostName;isHost=true;remoteMode=true;saveSessionLocal();
  enterWaitingRoom();
 }
 async function joinRoom(){
@@ -1849,7 +2196,7 @@ async function joinRoom(){
      $('joinError').textContent=data.reason==='started'?'המשחק כבר התחיל בחדר הזה.':'החדר מלא.';
      return;
    }
-   myRoom=code;mySeat=data.seat;myName=name;isHost=false;remoteMode=true;
+   myRoom=code;mySeat=data.seat;myName=name;isHost=false;remoteMode=true;saveSessionLocal();
    enterWaitingRoom();
  }catch(e){
    // Fall back to the older get+set path only if the atomic endpoint itself is
@@ -1863,7 +2210,7 @@ async function joinRoom(){
    meta.seats[seat]=name;
    let ok=await storeSet(`room_${code}_meta`,JSON.stringify(meta),true);
    if(!ok){$('joinError').textContent='שגיאת אחסון: '+(lastStorageError||'לא ידוע');return}
-   myRoom=code;mySeat=seat;myName=name;isHost=false;remoteMode=true;
+   myRoom=code;mySeat=seat;myName=name;isHost=false;remoteMode=true;saveSessionLocal();
    enterWaitingRoom();
  }
 }
@@ -1889,13 +2236,30 @@ async function pollWaitingRoom(){
 }
 async function hostStartRoom(){
  let raw=await storeGet(`room_${myRoom}_meta`,true);let meta=JSON.parse(raw);
- let n=meta.n,names=meta.seats.map((s,i)=>s||`Seat ${i+1}`);
+ let n=meta.n,names=meta.seats.map((s,i)=>s||`(מושב פנוי)`);
+ let joined=meta.seats.map(s=>s!==null); // which seats actually have a real person
  G={n,p:[],sb:meta.sb,bb:meta.bb,bba:meta.bba,mode:meta.modeKey,button:Math.floor(Math.random()*n),
     hand:0,street:'WAITING',board:[],deck:[],pot:0,maxBet:0,lastFullRaise:meta.bb,current:null,acted:new Set(),
     fullSeq:0,lastActSeq:Array(n).fill(-1),lastFacing:Array(n).fill(null),paused:false,ended:false,log:[],
-    decision:0,turnLeft:0,auto:true,remoteMode:true};
- let multipliers=Array(n).fill(1);
- G.p=Array.from({length:n},(_,i)=>({name:names[i],stack:Math.round(meta.bb*20*multipliers[i]),bet:0,total:0,hole:[],fold:false,allin:false,busted:false}));
+    decision:meta.clock||0,turnLeft:meta.clock||0,timeBankChips:Array(n).fill(meta.timeBankChips||0),auto:true,remoteMode:true};
+ // Base stack from the mode's actual depth (e.g. 50 for "50BB"), not a hardcoded
+ // 20 - the previous version always started every remote room at 20BB regardless
+ // of what stakes were selected, and never varied stacks for Bubble/Final Table.
+ let modeInfo=MODES[meta.modeKey]||MODES.d20;
+ let base=modeInfo[3]*meta.bb;
+ let multipliers;
+ if(meta.modeKey.startsWith('b')||meta.modeKey==='ft40'){
+   let lo=0.55,hi=1.5;
+   multipliers=n===1?[1]:Array.from({length:n},(_,i)=>+(lo+(hi-lo)*(i/(n-1))).toFixed(3));
+   sh(multipliers);
+ } else {
+   multipliers=Array(n).fill(1);
+ }
+ // A seat nobody ever claimed has no one to act for it and would otherwise stall
+ // the game forever waiting on a turn that never comes. Start it already busted
+ // (0 stack) so the whole engine - dealing, turn order, blinds - naturally skips
+ // it, and the hand plays out cleanly among just the people who actually joined.
+ G.p=Array.from({length:n},(_,i)=>({name:names[i],stack:joined[i]?Math.round(base*(multipliers[i]||1)):0,bet:0,total:0,hole:[],fold:false,allin:false,busted:!joined[i]}));
  if(meta.levelMinutes>0){G.levels=buildLevels(G.sb,G.bb,G.bba);G.levelIdx=0;G.levelSeconds=meta.levelMinutes*60;G.levelMinutes=meta.levelMinutes}else{G.levels=null;G.levelMinutes=0}
  meta.started=true;await storeSet(`room_${myRoom}_meta`,JSON.stringify(meta),true);
  clearInterval(waitPollTimer);
@@ -1919,11 +2283,18 @@ async function hostLoop(){
  let qRaw=await storeGet(`room_${myRoom}_queue`,true);
  let queue=qRaw?JSON.parse(qRaw):[];
  if(queue.length){
-  queue.forEach(a=>{if(G&&!G.ended&&G.current===a.seat){revealSeat=a.seat;act(a.type,a.amount)}});
+  queue.forEach(a=>{
+    if(!G||G.ended||G.current!==a.seat)return;
+    if(a.type==='timebank'){
+      if(G.timeBankChips&&G.timeBankChips[a.seat]>0){G.timeBankChips[a.seat]--;G.turnLeft+=30;render()}
+      return;
+    }
+    revealSeat=a.seat;act(a.type,a.amount);
+  });
   await storeSet(`room_${myRoom}_queue`,JSON.stringify([]),true);
  }
  if(G){
-  let pub={...G};delete pub.deck;pub.acted=Array.from(G.acted);
+  let pub={...G};delete pub.deck;pub.acted=Array.from(G.acted);pub.__history=history;
   await storeSet(`room_${myRoom}_state`,JSON.stringify(pub),true);
  }
 }
@@ -1933,11 +2304,30 @@ async function clientPoll(){
  if(!raw)return;
  try{
   let g=JSON.parse(raw);g.acted=new Set(g.acted||[]);g.remoteMode=true;
+  if(g.__history&&g.__history.length!==history.length){history=g.__history}
+  delete g.__history;
   G=g;render();
  }catch(e){}
 }
 let actionPending=false;
+let preActionType=null; // null | 'fold' | 'checkfold' - queued while waiting for my turn in a remote room
+let wasMyTurn=false;
+let lastPreActionHand=null;
+function setPreAction(type){
+ preActionType=(preActionType===type)?null:type; // click again to cancel
+ render();
+}
+function firePreActionIfDue(mine){
+ if(mine&&!wasMyTurn&&preActionType&&remoteMode){
+   let type=preActionType;preActionType=null;
+   let i=G.current,c=callAmt(i);
+   if(type==='fold')submitAction('fold');
+   else submitAction(c>0?'fold':'call'); // check/fold: check if free, otherwise fold
+ }
+ wasMyTurn=mine;
+}
 async function submitAction(type,amount){
+ preActionType=null;
  if(!remoteMode){revealSeat=G.current;act(type,amount);return}
  if(isHost){revealSeat=mySeat;act(type,amount);return}
  if(actionPending)return; // a click is already in flight - never queue the same intent twice
@@ -1963,6 +2353,7 @@ function copyRoomCode(){navigator.clipboard&&navigator.clipboard.writeText(myRoo
 async function leaveRoom(){
  clearInterval(waitPollTimer);clearInterval(hostLoopTimer);clearInterval(clientPollTimer);clearInterval(timer);clearInterval(levelTimer);
  if(isHost&&myRoom){try{let raw=await storeGet(`room_${myRoom}_meta`,true);if(raw){let meta=JSON.parse(raw);meta.ended=true;await storeSet(`room_${myRoom}_meta`,JSON.stringify(meta),true)}}catch(e){}}
+ clearSessionLocal();
  remoteMode=false;myRoom=null;mySeat=null;isHost=false;G=null;
  $('remoteWaitingRoom').classList.add('hidden');$('exitBtn').classList.add('hidden');$('hudmini').classList.add('hidden');$('topStatus').classList.remove('hidden');
  $('privacy').classList.remove('open');$('game').classList.add('hidden');$('lobby').classList.remove('hidden');
@@ -1978,5 +2369,6 @@ document.addEventListener('keydown',e=>{
  else if(e.key==='a'||e.key==='A')act('jam');
  else if(e.key==='r'||e.key==='R'){let el=$('raiseTo');if(el)el.focus()}
 });
+tryResumeSession();
 </script>
 </body></html>
