@@ -246,6 +246,9 @@ main{flex:1;min-width:0;position:relative}
 .dock-status b{color:var(--gold2)}
 .sizing{display:flex;flex-direction:column;gap:9px;background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:16px;padding:10px 12px}
 .presets{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+body.joinonly #tabbtnFree,body.joinonly #tabbtnLib,body.joinonly #tabbtnRemote,body.joinonly #remoteToggleCreate,body.joinonly #remoteToggleJoin,body.joinonly #remoteCreatePane,body.joinonly #storageDiag{display:none!important}
+body.joinonly #tabbtnRemote{display:none!important}
+.unitbtn{border-color:var(--gold)!important;color:var(--gold)!important;min-width:44px!important}
 .presets button{border:1px solid var(--line2);background:#101a22;border-radius:999px;padding:7px 13px;font-weight:800;font-size:12.5px;color:#cfdbe6;cursor:pointer;min-width:52px}
 .presets button.active{background:var(--gold);color:#241803;border-color:var(--gold2)}
 .presets button:disabled{opacity:.35}
@@ -1043,6 +1046,7 @@ function startSession(){let n=+$('num').value,m=sel==='custom'?customMode():MODE
  soundOn=+($('sound')?.value||0)===1;wasShown={};try{if(soundOn)ensureAudio();}catch(e){}
  if($('soloBots')&&$('soloBots').value==='1'){let humanSeat=+($('soloSeat')?.value||0);G.botSeats=Array.from({length:n},(_,i)=>i).filter(i=>i!==humanSeat)}else{G.botSeats=[]}
  botScheduledFor=null;clearTimeout(botTimer);
+ if(G.botSeats&&G.botSeats.length&&G.botSeats.includes(G.current)){$('privacy').classList.remove('open');revealSeat=null;render()} // first actor is a bot: newHand ran before botSeats existed
  playerStats={};statsProcessedHands=0;
  G.bountyOn=$('tourneyFormat')&&$('tourneyFormat').value==='1';
  if(G.bountyOn){
@@ -1182,7 +1186,7 @@ function showdown(){while(G.board.length<5)dealBoard(G.board.length===0?3:1);let
 function awardFold(i){let p=G.pot;G.p[i].stack+=p;G.log.push(`${G.p[i].name} wins ${fmt(p)}`);finishHand(G.p.map((_,k)=>k===i?p:0))}
 function finishHand(pay){
  history.push(JSON.parse(JSON.stringify({hand:G.hand,board:G.board,p:G.p,log:G.log,pay,button:G.button,n:G.n,sb:G.sb,bb:G.bb,bba:G.bba,hs:G.hs||null,sid:G.sessionId||0})));
- G.street='SHOWDOWN';G.current=null;G.pot=0;
+ G.street='SHOWDOWN';G.current=null;G.pot=0;G.finishedAt=null;G.realSD=!!G.pendingReveal||G.p.filter(q=>!q.fold&&q.hole&&q.hole.length===2).length>1;
  G.p.forEach(q=>{if(q.stack<=0)q.busted=true});
  if(G.pendingReveal){G.pendingRevealPay=pay;render();return}
  finalizeHandResult(pay);
@@ -1195,12 +1199,16 @@ function finalizeHandResult(pay){
  G.handResult=winners.length?winners.map(w=>`${G.p[w.i].name} +${fmtChip(w.v)}`).join(' · '):null;
  render();
  if(aliveIds().length<=1&&!(remoteMode&&isHost&&G.perms&&G.perms.reentry&&G.p.some((q,i)=>reentryEligible(i))))return finishTournament(aliveIds()[0]);
- if(G.auto&&!G.paused)setTimeout(()=>{if(!G.paused&&!G.ended){G.handResult=null;G.button=nextSeat(G.button);newHand()}},HAND_REVIEW_MS);
+ G.finishedAt=Date.now();armNext();
 }
+let nextTimer=null;
+function armNext(){clearTimeout(nextTimer);if(!G||!G.auto||G.paused||G.ended||G.street!=='SHOWDOWN'||G.pendingReveal)return;const h=G.hand;nextTimer=setTimeout(()=>{if(G&&G.hand===h&&G.street==='SHOWDOWN'&&!G.paused&&!G.ended){G.handResult=null;G.button=nextSeat(G.button);newHand()}},Math.max(400,HAND_REVIEW_MS-(Date.now()-(G.finishedAt||Date.now()))))}
+// watchdog: a finished hand must never sit idle
+setInterval(()=>{try{if(G&&G.auto&&!G.paused&&!G.ended&&G.street==='SHOWDOWN'&&G.finishedAt&&!(remoteMode&&!isHost)&&Date.now()-G.finishedAt>HAND_REVIEW_MS+3500&&!G.waitReentry&&$('endModal')&&!$('endModal').classList.contains('open')){G.pendingReveal=false;G.finishedAt=Date.now();G.handResult=null;G.button=nextSeat(G.button);newHand()}}catch(e){}},1500);
 function finishTournament(i){G.ended=true;G.current=null;render();if(G.isSpot){showSpotDebrief();return}$('endTitle').textContent=i!=null?`${G.p[i].name} ניצח/ה את הסשן`:'הסשן הושלם';$('endModal').classList.add('open')}
 function privacy(){if(G.current==null||G.ended)return;revealSeat=null;if(remoteMode)return;if(G.botSeats&&G.botSeats.includes(G.current))return;$('privName').textContent=G.p[G.current].name;$('privacy').classList.add('open');beep()}
 function reveal(){revealSeat=G.current;$('privacy').classList.remove('open');render()}
-function togglePause(){G.paused=!G.paused;render()}function nextManual(){if(G.street==='SHOWDOWN'&&!G.ended){G.button=nextSeat(G.button);newHand()}}
+function togglePause(){if(remoteMode&&!isHost)return;G.paused=!G.paused;render();if(!G.paused)armNext()}function nextManual(){if(G.street==='SHOWDOWN'&&!G.ended){G.button=nextSeat(G.button);newHand()}}
 function tick(){
  if(!G||G.paused||G.ended||G.current==null||!G.decision)return;
  G.turnLeft--;
@@ -1626,9 +1634,9 @@ function levelTick(){
 function toast(msg){let t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),1800)}
 function onRaiseInput(source){
  let v=+source.value;
- raiseCurrentVal=liveShowBB?Math.round(v*G.bb):Math.round(v);
+ raiseCurrentVal=liveShowBB?Math.round(v*unitSz()):Math.round(v);
  let other=source.id==='raiseTo'?$('raiseRange'):$('raiseTo');
- if(other)other.value=liveShowBB?(raiseCurrentVal/G.bb).toFixed(1):raiseCurrentVal;
+ if(other)other.value=liveShowBB?(raiseCurrentVal/unitSz()).toFixed(1):raiseCurrentVal;
  lastPresetClicked=null;
 }
 function wheelAdjustRaise(ev){
@@ -2564,14 +2572,15 @@ async function runStorageDiag(){
  if(got!=='ping'){el.textContent='⚠ השרת לא החזיר את מה שנכתב (קיבלתי: '+JSON.stringify(got)+')';el.className='storage-diag bad';return}
  el.textContent='✓ מחובר לשרת';el.className='storage-diag good';
 }
-function showRemotePane(which){
+function showRemotePane(which){if(joinOnly)which='join';
  $('remoteToggleCreate').classList.toggle('active',which==='create');
  $('remoteToggleJoin').classList.toggle('active',which==='join');
  $('remoteCreatePane').classList.toggle('hidden',which!=='create');
  $('remoteJoinPane').classList.toggle('hidden',which!=='join');
 }
 
-async function createRoom(){
+let joinOnly=false;
+async function createRoom(){if(joinOnly){toast('אין הרשאה ליצור חדר');return}
  let code=roomCodeGen();
  let n=+$('rNum').value, modeKey=$('rMode').value, m,customStack=0;
  if(modeKey==='custom'){let st=Math.max(100,+$('rCustomStack').value||20000),sb=Math.max(1,+$('rCustomSB').value||100),bbv=Math.max(2,+$('rCustomBB').value||200);if(bbv<=sb)bbv=sb*2;m=['Custom',sb,bbv,st/bbv];customStack=st}
@@ -2722,7 +2731,7 @@ function sanitizeHistory(k){
 function stateForSeat(k){
  const pub={...G};delete pub.deck;pub.acted=Array.from(G.acted);
  const sd=G.street==='SHOWDOWN';
- pub.p=G.p.map((q,j)=>(j===k||(sd&&!q.fold&&q.hole&&q.hole.length===2))?q:Object.assign({},q,{hole:(q.hole&&q.hole.length)?['Xx','Xx']:[]}));
+ pub.p=G.p.map((q,j)=>(j===k||(sd&&G.realSD&&!q.fold&&q.hole&&q.hole.length===2))?q:Object.assign({},q,{hole:(q.hole&&q.hole.length)?['Xx','Xx']:[]}));
  pub.histN=history.length;
  if(G.perms&&G.perms.hud)pub.__stats=statsStore;
  if(G.perms&&G.perms.report)pub.__report=reportFor(k);
@@ -3106,12 +3115,14 @@ function renderLogPanel(){
  const b=$('logbody');b.innerHTML=html;b.scrollTop=b.scrollHeight;
 }
 /* ----- raise sizing ----- */
+let sizeUnit='BB';function unitSz(){return Math.max(1,(sizeUnit==='SB'?G.sb:G.bb)||G.bb)}
+function setSizeUnit(u){sizeUnit=u;lastPresetClicked=null;render()}
 function sizingBounds(){const q=G.p[G.current],max=q.bet+q.stack,min=Math.min(minRaiseTo(),max);return{q,max,min}}
 function updateSizingUI(){
  if(!G||G.current==null||!$('raiseTo'))return;
  const {max,min}=sizingBounds();
  let v=raiseCurrentVal!=null?Math.max(min,Math.min(max,raiseCurrentVal)):min;
- const dv=liveShowBB?(v/G.bb).toFixed(1):String(v);
+ const dv=liveShowBB?(v/unitSz()).toFixed(1):String(v);
  $('raiseTo').value=dv;if($('raiseRange'))$('raiseRange').value=dv;
  const lbl=$('raiseLbl'),sub=$('raiseSub');
  if(lbl)lbl.textContent=v>=max?'ALL-IN':(G.maxBet?'RAISE':'BET');
@@ -3123,7 +3134,7 @@ function preset(k){
  const {q,max,min}=sizingBounds(),c=callAmt(G.current);let t=min;
  if(k==='allin')t=max;
  else if(k!=='min'){
-  if(G.street==='PREFLOP')t=Math.max(min,Math.round(parseFloat(k)*Math.max(G.bb,G.maxBet)));
+  if(G.street==='PREFLOP')t=Math.max(min,sizeUnit==='SB'&&!G.maxBet?Math.round(parseFloat(k)*G.sb):sizeUnit==='SB'?Math.round(parseFloat(k)*G.maxBet/2):Math.round(parseFloat(k)*Math.max(G.bb,G.maxBet)));
   else{let pct=k==='pot'?1:parseFloat(k)/100;t=G.maxBet===0?Math.max(min,Math.round(G.pot*pct)):Math.max(min,Math.round(G.maxBet+(G.pot+c)*pct))}
  }
  raiseCurrentVal=Math.min(max,Math.max(min,t));lastPresetClicked=k;updateSizingUI();
@@ -3141,7 +3152,7 @@ function onRaiseInput(src){
 function stepRaise(dir){
  if(!G||G.current==null)return;const {max,min}=sizingBounds();
  const cur=raiseCurrentVal!=null?raiseCurrentVal:min;
- raiseCurrentVal=Math.max(min,Math.min(max,cur+dir*G.bb));lastPresetClicked=null;updateSizingUI();
+ raiseCurrentVal=Math.max(min,Math.min(max,cur+dir*unitSz()));lastPresetClicked=null;updateSizingUI();
 }
 function wheelAdjustRaise(ev){ev.preventDefault();stepRaise(ev.deltaY<0?1:-1)}
 function doRaise(){
@@ -3151,8 +3162,8 @@ function doRaise(){
 }
 function dockHTML(x){
  const {mine,i,q,c,min,max,canR,showPre}=x;
- const ql=G.street==='PREFLOP'?['min','2.2','2.5','3']:['min','33','50','75','pot'];
- const lab=k=>k==='min'?'Min':k==='pot'?'Pot':G.street==='PREFLOP'?k+'x':k+'%';
+ const ql=G.street==='PREFLOP'?(sizeUnit==='SB'?['min','4','5','6','8']:['min','2.2','2.5','3']):['min','33','50','75','pot'];
+ const lab=k=>k==='min'?'Min':k==='pot'?'Pot':G.street==='PREFLOP'?k+(sizeUnit==='SB'?'sb':'x'):k+'%';
  const dis=mine?'':'disabled';
  let st='';
  if(G.ended)st='הסשן הסתיים';
@@ -3163,15 +3174,15 @@ function dockHTML(x){
  else st=`<span>ממתינים לשחקן</span> <bdi><b>${esc(G.p[G.current].name)}</b></bdi> <bdi><b id="dockClock" class="num">${G.decision?G.turnLeft+'s':''}</b></bdi>`;
  let pre=showPre?`<div class="preaction-row"><button type="button" class="preaction-chip ${preActionType==='fold'?'active':''}" onclick="setPreAction('fold')"><span class="preaction-box">${preActionType==='fold'?'✓':''}</span>Fold</button><button type="button" class="preaction-chip ${preActionType==='checkfold'?'active':''}" onclick="setPreAction('checkfold')"><span class="preaction-box">${preActionType==='checkfold'?'✓':''}</span>Check/Fold</button></div>`:'';
  const rv=raiseCurrentVal!=null?Math.max(min||0,Math.min(max||0,raiseCurrentVal)):min;
- const dv=liveShowBB&&G.bb?((rv||0)/G.bb).toFixed(1):(rv||0),dmin=liveShowBB?((min||0)/G.bb).toFixed(1):(min||0),dmax=liveShowBB?((max||0)/G.bb).toFixed(1):(max||0);
- const step=liveShowBB?'0.5':'1';
+ const us=unitSz(),dv=liveShowBB&&G.bb?((rv||0)/us).toFixed(1):(rv||0),dmin=liveShowBB?((min||0)/us).toFixed(1):(min||0),dmax=liveShowBB?((max||0)/us).toFixed(1):(max||0);
+ const step=liveShowBB?'0.5':String(us);
  const callLbl=!mine||!q?'CHECK':(c?(c>=q.stack?'CALL ALL-IN':'CALL'):'CHECK'),callSub=mine&&q&&c?fmtChip(Math.min(c,q.stack)):'';
  let minor='';
  if(mine&&G.decision&&G.timeBankChips&&G.timeBankChips[i]>0)minor+=`<button type="button" class="btn sm" onclick="useTimeBank()">בנק זמן +30s (${G.timeBankChips[i]})</button>`;
  if(G.street==='SHOWDOWN'&&!G.auto&&!G.ended)minor+=`<button type="button" class="btn gold sm" onclick="nextManual()">${G.isSpot?'סיכום התרגיל':'היד הבאה'}</button>`;
  return `<div class="dock">${pre}<div class="dock-status">${st}</div>
   <div class="sizing" ${mine?'':'style="opacity:.45;pointer-events:none"'}>
-   <div class="presets">${ql.map(k=>`<button type="button" data-k="${k}" class="${lastPresetClicked===k?'active':''}" ${dis} onclick="preset('${k}')">${lab(k)}</button>`).join('')}<button type="button" data-k="allin" class="${lastPresetClicked==='allin'?'active':''}" ${dis} onclick="preset('allin')">All-in</button></div>
+   <div class="presets">${ql.map(k=>`<button type="button" data-k="${k}" class="${lastPresetClicked===k?'active':''}" ${dis} onclick="preset('${k}')">${lab(k)}</button>`).join('')}<button type="button" class="unitbtn" ${dis} onclick="setSizeUnit('${sizeUnit==='BB'?'SB':'BB'}')" title="יחידת הימור">${sizeUnit}</button><button type="button" data-k="allin" class="${lastPresetClicked==='allin'?'active':''}" ${dis} onclick="preset('allin')">All-in</button></div>
    <div class="sizerow" onwheel="wheelAdjustRaise(event)"><button type="button" class="stepbtn" ${dis} onclick="stepRaise(-1)">−</button><input id="raiseRange" type="range" min="${dmin}" max="${dmax}" step="${step}" value="${dv}" ${dis} oninput="onRaiseInput(this)"><button type="button" class="stepbtn" ${dis} onclick="stepRaise(1)">+</button><input id="raiseTo" type="number" inputmode="decimal" min="${dmin}" max="${dmax}" step="${step}" value="${dv}" ${dis} oninput="onRaiseInput(this)"></div>
   </div>
   <div class="acts">
@@ -3238,7 +3249,7 @@ function _renderImpl(){
  if(decisionKey!==raiseDecisionKey){raiseDecisionKey=decisionKey;raiseCurrentVal=null;lastPresetClicked=null}
  const myQ=remoteMode&&mySeat!=null?G.p[mySeat]:null;
  const showPre=!!(remoteMode&&!mine&&myQ&&!myQ.fold&&!myQ.busted&&myQ.hole&&myQ.hole.length===2&&G.current!=null&&!G.ended);
- const key=[mine,i,G.street,G.hand,c,min,max,canR,actionPending,preActionType,showPre,G.paused,G.ended,G.auto,liveShowBB,i!=null&&G.timeBankChips?G.timeBankChips[i]:0,G.log.length,G.current==null].join('|');
+ const key=[mine,i,G.street,G.hand,c,min,max,canR,actionPending,preActionType,showPre,G.paused,G.ended,G.auto,liveShowBB,i!=null&&G.timeBankChips?G.timeBankChips[i]:0,G.log.length,G.current==null,sizeUnit].join('|');
  if(key!==lastDockKey){lastDockKey=key;$('actionbar').innerHTML=dockHTML({mine,i,q,c,min,max,canR,showPre});if(mine)updateSizingUI()}
  layoutStage();
  // ---- table ----
@@ -3250,7 +3261,7 @@ function _renderImpl(){
  G.p.forEach((q,k)=>{
   const d=(k-hero+n)%n,xy=seatXY(d,n,kind),x=xy[0],y=xy[1];
   const viewing=remoteMode?k===mySeat:k===revealSeat,out=q.hole.length!==2;
-  const show=!out&&((sdAll&&!q.fold)||(viewing&&!q.fold));
+  const show=!out&&((sdAll&&G.realSD&&!q.fold)||(viewing&&!q.fold));
   const big=viewing&&show&&!sdAll;
   const folded=q.fold&&!out,turn=k===G.current,won=payNow&&payNow[k]>0;
   const tg=tagOf(q.name),tagc=tg&&tg.c!=null?TAG_COLORS[tg.c]:null;
@@ -3389,7 +3400,7 @@ function renderPlayers(){
  if($('bountySeatsWrap'))$('bountySeatsWrap').style.display=bountyOn?'':'none';
  if(bountyOn)syncBountySeats();
 }
-function switchTab(name){
+function switchTab(name){if(joinOnly)name='remote';
  $('tabbtnFree').classList.toggle('active',name==='free');$('tabbtnLib').classList.toggle('active',name==='library');$('tabbtnRemote').classList.toggle('active',name==='remote');
  $('tabFree').classList.toggle('hidden',name!=='free');$('tabLibrary').classList.toggle('hidden',name!=='library');$('tabRemote').classList.toggle('hidden',name!=='remote');
  $('playersBox').classList.toggle('hidden',name!=='free');
@@ -3444,6 +3455,81 @@ function exportSessionHistory(){
 }
 /* ================= export dialog ================= */
 let exportIdx=null;
+
+/* ===== visual hand image export ===== */
+function handToCanvas(H,opts){
+ opts=opts||{};const hero=opts.hero||heroName(),all=!!opts.all,unitBB=(opts.bb!=null)?opts.bb:(typeof replayShowBB!=='undefined'&&replayShowBB);
+ const u=v=>unitBB&&H.bb?(v/H.bb).toFixed(1).replace(/\.0$/,'')+' BB':fmt(v);
+ const W=1080,P=44,CW=64,CH=90,sc=2;
+ const showHole=i=>H.hole[i]&&H.hole[i].length===2&&(all||H.names[i]===hero||(H.showdown&&H.contenders.includes(i)));
+ const players=[];for(let i=0;i<H.n;i++)if(H.inHand[i])players.push(i);
+ const streams=['PREFLOP','FLOP','TURN','RIVER'];
+ const blocks=[];
+ const post=H.events.filter(e=>e.k==='post');
+ streams.forEach(st=>{const ev=H.events.filter(e=>(e.k==='act'||e.k==='board')&&e.st===st);if(!ev.length&&st!=='PREFLOP')return;blocks.push({st,ev})});
+ let rows=0;blocks.forEach(b=>{rows+=b.ev.filter(e=>e.k==='act').length+1+(b.ev.some(e=>e.k==='board')?2:0)});
+ const winners=H.names.map((n,i)=>H.collect[i]>0?i:-1).filter(i=>i>=0);
+ const Ht=130+(CH+60)+players.length*64+40+rows*40+40+winners.length*60+110;
+ const cv=document.createElement('canvas');cv.width=W*sc;cv.height=Ht*sc;const c=cv.getContext('2d');c.scale(sc,sc);
+ const rr=(x,y,w,h,r)=>{c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()};
+ const F='system-ui,-apple-system,Segoe UI,Arial,sans-serif';
+ const g=c.createLinearGradient(0,0,0,Ht);g.addColorStop(0,'#0e1a24');g.addColorStop(1,'#07101a');c.fillStyle=g;c.fillRect(0,0,W,Ht);
+ const card=(cd,x,y,w,h)=>{const r=cd[0]==='T'?'10':cd[0],red=cd[1]==='h'||cd[1]==='d';c.fillStyle='#fff';rr(x,y,w,h,w*.12);c.fill();c.fillStyle=red?'#d4262d':'#111';c.textAlign='center';c.font=`800 ${Math.round(w*.52)}px ${F}`;c.fillText(r,x+w/2,y+h*.45);c.font=`700 ${Math.round(w*.5)}px ${F}`;c.fillText(SUIT_CH[cd[1]],x+w/2,y+h*.82)};
+ const back=(x,y,w,h)=>{c.fillStyle='#24456b';rr(x,y,w,h,w*.12);c.fill();c.strokeStyle='#4a78ab';c.lineWidth=2;rr(x+4,y+4,w-8,h-8,w*.08);c.stroke()};
+ // header
+ c.textAlign='left';c.fillStyle='#f3c24a';c.font=`900 30px ${F}`;c.fillText('OUTPLAY LIVE LAB',P,64);
+ c.fillStyle='#8fa3b5';c.font=`600 22px ${F}`;c.fillText(`Hand #${H.hand}  ·  Blinds ${fmt(H.sb)}/${fmt(H.bb)}${H.bba?' ('+fmt(H.bba)+')':''}  ·  ${players.length} players`,P,100);
+ let y=140;
+ // board
+ c.fillStyle='#143a2c';rr(P,y,W-2*P,CH+50,28);c.fill();c.strokeStyle='#1f6a4e';c.lineWidth=3;c.stroke();
+ const bw=5*CW+4*12,bx=(W-bw)/2;
+ for(let k=0;k<5;k++){const x=bx+k*(CW+12);if(H.board[k])card(H.board[k],x,y+25,CW,CH);else{c.fillStyle='rgba(255,255,255,.06)';rr(x,y+25,CW,CH,8);c.fill()}}
+ c.textAlign='center';c.fillStyle='#cfe7da';c.font=`700 20px ${F}`;c.fillText('POT '+u(H.totalPot),W/2,y+CH+44);
+ y+=CH+50+30;
+ // players
+ c.textAlign='left';
+ players.forEach(i=>{
+  const won=H.collect[i]>0;c.fillStyle=won?'rgba(243,194,74,.14)':'rgba(255,255,255,.04)';rr(P,y,W-2*P,54,14);c.fill();
+  if(won){c.strokeStyle='#f3c24a';c.lineWidth=2;c.stroke()}
+  c.fillStyle='#8fa3b5';c.font=`800 20px ${F}`;c.fillText(H.pos[i]||'',P+16,y+34);
+  c.fillStyle='#fff';c.font=`700 24px ${F}`;c.fillText(H.names[i],P+90,y+35);
+  const hx=W-P-16-2*40-6-(won?0:0);
+  if(showHole(i)){card(H.hole[i][0],hx-250,y+2,38,50);card(H.hole[i][1],hx-250+44,y+2,38,50)}else{back(hx-250,y+2,38,50);back(hx-250+44,y+2,38,50)}
+  c.textAlign='right';c.font=`700 20px ${F}`;c.fillStyle='#8fa3b5';c.fillText('Stack '+u(H.start[i]),hx-270,y+34);
+  {const net=H.collect[i]-(H.live[i]||0)-(H.ante[i]||0);if(net>0){c.fillStyle='#f3c24a';c.font=`900 24px ${F}`;c.fillText('+'+u(net),W-P-16,y+35)}else if(net<0){c.fillStyle='#ff7b80';c.font=`800 22px ${F}`;c.fillText(u(net).replace(/^-?/,'−'),W-P-16,y+35)}}
+  c.textAlign='left';y+=64;
+ });
+ y+=14;
+ // actions
+ const colr={fold:'#8fa3b5',check:'#6cc5ff',call:'#7be0a0',bet:'#f3c24a',raise:'#ff9a4a',allin:'#ff5a5f'};
+ blocks.forEach(b=>{
+  c.fillStyle='#f3c24a';c.font=`900 22px ${F}`;c.textAlign='left';c.fillText(b.st==='PREFLOP'?'PRE-FLOP':b.st,P,y+24);
+  const be=b.ev.filter(e=>e.k==='board').flatMap(e=>e.cards);be.forEach((cd,k)=>card(cd,P+170+k*40,y-4,34,48));
+  y+=(be.length?58:36);
+  b.ev.filter(e=>e.k==='act').forEach(e=>{
+   const t=e.ai?'allin':e.t,txt=e.t==='fold'?'Fold':e.t==='check'?'Check':e.ai?'All-In '+u(e.to):e.t==='call'?'Call '+u(e.d):e.t==='bet'?'Bet '+u(e.to):'Raise '+u(e.to);
+   c.fillStyle='#8fa3b5';c.font=`700 19px ${F}`;c.fillText(H.pos[e.i]||'',P+10,y+20);
+   c.fillStyle='#e6eef5';c.font=`600 21px ${F}`;c.fillText(H.names[e.i],P+80,y+21);
+   c.fillStyle=colr[t]||'#fff';c.font=`800 21px ${F}`;c.fillText(txt,P+420,y+21);y+=40;
+  });
+  y+=14;
+ });
+ // result
+ y+=6;c.textAlign='center';
+ winners.forEach(i=>{
+  let d=H.showdown&&H.hole[i].length===2&&H.board.length===5?describeHandCategory(best7([...H.hole[i],...H.board])):(H.showdown?'':'ללא שואודאון');
+  c.fillStyle='#f3c24a';c.font=`900 30px ${F}`;c.fillText(`${H.names[i]} wins ${u(H.collect[i])}`,W/2,y+30);
+  if(d&&!/[֐-׿]/.test(d)){c.fillStyle='#cfe7da';c.font=`600 20px ${F}`;c.fillText(d,W/2,y+58)}
+  y+=66;
+ });
+ c.fillStyle='#4a6075';c.font=`600 16px ${F}`;c.fillText('outplay-live-lab · poker training platform',W/2,Ht-26);
+ return cv;
+}
+function downloadHandImage(idx,all){
+ const h=history[idx==null?history.length-1:idx];if(!h){toast('אין יד להורדה');return}
+ const H=normalizeHand(h),cv=handToCanvas(H,{all:all!=null?all:(typeof rp!=='undefined'&&rp.showAll)});
+ cv.toBlob(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`OUTPLAY_hand_${H.hand}.png`;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500);toast('התמונה הורדה')},'image/png');
+}
 function openExport(idx){
  if(!can('export')){toast('המאמן לא אפשר הורדת Hand History בחדר הזה');return}
  exportIdx=(typeof idx==='number')?idx:null;
@@ -3457,7 +3543,7 @@ function openExport(idx){
   </div>
   <label style="display:flex;gap:9px;align-items:center;margin:14px 0 4px;font-size:13.5px;cursor:pointer"><input type="checkbox" id="xAll"> לכלול את הקלפים של כל השחקנים (לניתוח אימון)</label>
   <div class="muted" style="font-size:12px;line-height:1.5">בלי הסימון, כמו באתרים אמיתיים: רק קלפי ההירו, ושאר הקלפים רק בשואודאון.</div>
-  <div class="toolbar" style="margin-top:16px"><button type="button" class="btn gold" onclick="doExport('file')">הורדת קובץ ‎.txt‎</button><button type="button" class="btn" onclick="doExport('copy')">העתקה ללוח</button><button type="button" class="btn ghost" onclick="exportSessionHistory()">גיבוי OUTPLAY (JSON)</button></div>`;
+  <div class="toolbar" style="margin-top:16px">${exportIdx!=null?`<button type="button" class="btn gold" onclick="downloadHandImage(${exportIdx},$('xAll').checked)">הורדת תמונה</button>`:''}<button type="button" class="btn" onclick="doExport('file')">הורדת קובץ ‎.txt‎</button><button type="button" class="btn" onclick="doExport('copy')">העתקה ללוח</button><button type="button" class="btn ghost" onclick="exportSessionHistory()">גיבוי OUTPLAY (JSON)</button></div>`;
  $('dlgModal').classList.add('open');
 }
 function doExport(mode){
@@ -3489,7 +3575,7 @@ function renderReplay(){
  const H=rp.H,h=H.src,hero=heroName();
  $('historyBox').className='modalbox';
  $('historyBox').innerHTML=`<div class="mhead"><h2>יד #${esc(H.hand)} <span class="muted" style="font-size:14px;direction:ltr;display:inline-block">${fmt(H.sb)}/${fmt(H.bb)}${H.bba?' ('+fmt(H.bba)+')':''}</span></h2>
-  ${rp.hi!=null&&can('export')?`<button type="button" class="btn gold sm" onclick="openExport(${rp.hi})">הורדת היד</button>`:''}<button type="button" class="btn ghost sm" onclick="toggleReplayUnit()">${replayShowBB?'BB':'צ\'יפים'}</button><button type="button" class="btn ghost sm ${rp.showAll?'on':''}" onclick="rp.showAll=!rp.showAll;renderReplay()">${rp.showAll?'כל הקלפים ✓':'כל הקלפים'}</button><button type="button" class="btn ghost sm" onclick="${rp.back==='report'?'openReport(rp.rname)':'renderHistoryList()'}">${rp.back==='report'?'לדוח':'לרשימה'}</button><button type="button" class="iconbtn" onclick="closeModal('historyModal')">✕</button></div>
+  ${rp.hi!=null&&can('export')?`<button type="button" class="btn gold sm" onclick="downloadHandImage(${rp.hi})">הורדת תמונה</button><button type="button" class="btn ghost sm" onclick="openExport(${rp.hi})">טקסט</button>`:''}<button type="button" class="btn ghost sm" onclick="toggleReplayUnit()">${replayShowBB?'BB':'צ\'יפים'}</button><button type="button" class="btn ghost sm ${rp.showAll?'on':''}" onclick="rp.showAll=!rp.showAll;renderReplay()">${rp.showAll?'כל הקלפים ✓':'כל הקלפים'}</button><button type="button" class="btn ghost sm" onclick="${rp.back==='report'?'openReport(rp.rname)':'renderHistoryList()'}">${rp.back==='report'?'לדוח':'לרשימה'}</button><button type="button" class="iconbtn" onclick="closeModal('historyModal')">✕</button></div>
   <div id="rpResult"></div><div class="rp-stage"><div class="rp-table" id="rpTable"></div></div>
   <div class="rp-tl" id="rpTl"></div>`;
  rpRefresh();
@@ -3597,7 +3683,16 @@ function backToLobby(){clearInterval(timer);clearInterval(levelTimer);G=null;las
 new MutationObserver(()=>{if($('game').classList.contains('hidden')){$('topTools').style.display='none';document.body.classList.remove('ingame');$('hudmini').classList.add('hidden');$('topStatus').classList.remove('hidden');lastDockKey=''}}).observe($('game'),{attributes:true,attributeFilter:['class']});
 window.addEventListener('resize',()=>{if(G){lastDockKey='';render()}if(rp.H&&$('historyModal').classList.contains('open')&&$('rpTable'))rpRefresh()});
 renderHeroArt();
-(function(){const m=location.search.match(/[?&]join=([A-Za-z0-9]{4,6})/);if(m&&!localStorage.getItem(SESSION_KEY)){switchTab('remote');showRemotePane('join');$('jCode').value=m[1].toUpperCase();setTimeout(()=>{try{$('jName').focus()}catch(e){}},300)}})();
+(function(){
+ const m=location.search.match(/[?&]join=([A-Za-z0-9]{4,6})/);
+ const lock=()=>{joinOnly=true;document.body.classList.add('joinonly');try{switchTab('remote');showRemotePane('join')}catch(e){}};
+ if(m){try{sessionStorage.setItem('op_joinonly','1')}catch(e){}}
+ let was=false;try{was=sessionStorage.getItem('op_joinonly')==='1'}catch(e){}
+ if(m||was)lock();
+ if(m&&!localStorage.getItem(SESSION_KEY)){switchTab('remote');showRemotePane('join');$('jCode').value=m[1].toUpperCase();setTimeout(()=>{try{$('jName').focus()}catch(e){}},300)}
+ // licensed server: anyone without a coach code is a player and can only join
+ fetch('/api/config').then(r=>r.json()).then(d=>{if(d&&d.licensed&&!d.isCoach)lock()}).catch(()=>{});
+})();
 
 tryResumeSession();
 </script>
